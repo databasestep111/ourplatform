@@ -6,6 +6,10 @@ from search.search import Search
 from research.researcher import Researcher
 
 
+# ==========================================
+# APPLICATION
+# ==========================================
+
 app = Flask(__name__)
 
 
@@ -51,7 +55,7 @@ platform.start()
 
 
 # ==========================================
-# COMMON TEMPLATE DATA
+# SHARED TEMPLATE DATA
 # ==========================================
 
 def template_data():
@@ -78,14 +82,13 @@ def home():
 
 
 # ==========================================
-# SEARCH PAGE
+# SEARCH
 # ==========================================
 
 @app.route("/search", methods=["GET", "POST"])
 def search_page():
 
     query = ""
-
     results = []
 
     if request.method == "POST":
@@ -108,7 +111,7 @@ def search_page():
 
 
 # ==========================================
-# MEMORY PAGE
+# MEMORY
 # ==========================================
 
 @app.route("/memory", methods=["GET", "POST"])
@@ -153,7 +156,7 @@ def memory_page():
 
 
 # ==========================================
-# RESEARCH PAGE
+# RESEARCH
 # ==========================================
 
 @app.route("/research", methods=["GET", "POST"])
@@ -205,10 +208,10 @@ def research_page():
 
 
 # ==========================================
-# AI ASSISTANT PAGE
+# AI ASSISTANT
 # ==========================================
 
-@app.route("/assistant", methods=["GET"])
+@app.route("/assistant")
 def assistant_page():
 
     return render_template(
@@ -218,20 +221,27 @@ def assistant_page():
 
 
 # ==========================================
-# SYSTEM PAGE
+# SYSTEM
 # ==========================================
 
 @app.route("/system")
 def system_page():
 
+    health = platform.health_check()
+    logs = platform.get_logs()
+    errors = platform.get_errors()
+
     return render_template(
         "system.html",
+        health=health,
+        logs=logs,
+        errors=errors,
         **template_data()
     )
 
 
 # ==========================================
-# HEALTH CHECK
+# HEALTH ENDPOINT
 # ==========================================
 
 @app.route("/health")
@@ -240,11 +250,12 @@ def health():
     return {
         "status": "ok",
         "platform": platform.status(),
+        "health": platform.health_check(),
     }
 
 
 # ==========================================
-# RUN APPLICATION
+# RUN SERVER
 # ==========================================
 
 if __name__ == "__main__":
