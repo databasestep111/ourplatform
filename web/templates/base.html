@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+        OurPlatform
+        {% endblock %}
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav {
+            margin-top: 15px;
+        }
+
+        nav a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+        }
+
+        textarea {
+            min-height: 100px;
+        }
+
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>OurPlatform</h1>
+
+    <nav>
+
+        <a href="/">Dashboard</a>
+        <a href="/search">Search</a>
+        <a href="/memory">Memory</a>
+        <a href="/research">Research</a>
+        <a href="/system">System</a>
+
+    </nav>
+
+</header>
+
+<main>
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+<footer>
+
+    OurPlatform
+
+</footer>
+
+</body>
+
+</html>
