@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}
+OurPlatform AI Assistant
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================
+     ASSISTANT HEADER
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🤖 AI Assistant
+    </h2>
+
+    <p>
+        Your central assistant interface for
+        interacting with the platform.
+    </p>
+
+</div>
+
+
+<!-- =========================
+     ASSISTANT STATUS
+========================= -->
+
+<div class="grid">
+
+    <div class="card">
+
+        <h3>
+            🧠 Memory
+        </h3>
+
+        <strong>
+            {{ memory_count }}
+        </strong>
+
+        <p>
+            memories available to the platform.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            🔎 Search
+        </h3>
+
+        <strong>
+            {{ search_count }}
+        </strong>
+
+        <p>
+            indexed items available.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            🔬 Research
+        </h3>
+
+        <strong>
+            {{ research_count }}
+        </strong>
+
+        <p>
+            research tasks available.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     CHAT AREA
+========================= -->
+
+<div class="card">
+
+    <h2>
+        💬 Assistant
+    </h2>
+
+    <div
+        style="
+            min-height: 250px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        "
+    >
+
+        {% if response %}
+
+        <p>
+            <strong>
+                Assistant:
+            </strong>
+        </p>
+
+        <p>
+            {{ response }}
+        </p>
+
+        {% else %}
+
+        <p>
+            <strong>
+                Assistant:
+            </strong>
+        </p>
+
+        <p>
+            Hello. What would you like to
+            work on?
+        </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <form
+        action="/assistant"
+        method="POST"
+    >
+
+        <textarea
+            name="prompt"
+            placeholder="Ask the assistant something..."
+            required
+        ></textarea>
+
+        <button type="submit">
+            Send
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- =========================
+     ASSISTANT CAPABILITIES
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🧩 Assistant Capabilities
+    </h2>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                🧠 Memory
+            </h3>
+
+            <p>
+                Work with information stored
+                in the platform memory.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                🔎 Search
+            </h3>
+
+            <p>
+                Use the platform search system
+                to locate relevant information.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                🔬 Research
+            </h3>
+
+            <p>
+                Help organize research questions
+                and tasks.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                ⚙️ Core
+            </h3>
+
+            <p>
+                Work as an interface between
+                the user and platform systems.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     ASSISTANT WORKFLOW
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🔄 Assistant Workflow
+    </h2>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                1. Input
+            </h3>
+
+            <p>
+                Receive a request from the user.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                2. Understand
+            </h3>
+
+            <p>
+                Determine what the user is
+                asking for.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                3. Use Tools
+            </h3>
+
+            <p>
+                Eventually interact with
+                search, memory, and research.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                4. Respond
+            </h3>
+
+            <p>
+                Return useful information
+                through the interface.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     FUTURE DEVELOPMENT
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🚀 Assistant Roadmap
+    </h2>
+
+    <ul>
+
+        <li>
+            Basic assistant interface
+        </li>
+
+        <li>
+            Conversation history
+        </li>
+
+        <li>
+            Memory integration
+        </li>
+
+        <li>
+            Search integration
+        </li>
+
+        <li>
+            Research integration
+        </li>
+
+        <li>
+            Tool selection
+        </li>
+
+        <li>
+            Context management
+        </li>
+
+        <li>
+            Better responses
+        </li>
+
+    </ul>
+
+</div>
+
+
+{% if message %}
+
+<div class="card">
+
+    <h3>
+        {{ message }}
+    </h3>
+
+</div>
+
+{% endif %}
+
+
+{% endblock %}
