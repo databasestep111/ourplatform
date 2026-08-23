@@ -1,0 +1,761 @@
+{% extends "base.html" %}
+
+{% block title %}
+Advanced Search
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <h2>🔎 Advanced Search</h2>
+    <p>
+        Build precise searches using fields, phrases,
+        Boolean operators, ranges, fuzzy matching,
+        boosts, filters, sorting, and pagination.
+    </p>
+</div>
+
+<form action="/search" method="POST" id="advanced-search-form">
+
+    <div class="card">
+        <h3>Query</h3>
+
+        <label for="query">
+            Search query
+        </label>
+
+        <textarea
+            id="query"
+            name="query"
+            rows="4"
+            placeholder='Try: title:"search engine" AND category:technology'
+            autocomplete="off"
+            spellcheck="false"
+            required
+        >{{ query or '' }}</textarea>
+
+        <div class="grid">
+
+            <div>
+                <label for="search-mode">
+                    Search mode
+                </label>
+
+                <select id="search-mode" name="search_mode">
+                    <option value="relevance">Relevance</option>
+                    <option value="exact">Exact</option>
+                    <option value="phrase">Phrase</option>
+                    <option value="fuzzy">Fuzzy</option>
+                    <option value="boolean">Boolean</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="limit">
+                    Results
+                </label>
+
+                <select id="limit" name="limit">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="250">250</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button type="submit">
+            🔎 Run Advanced Search
+        </button>
+
+        <button
+            type="button"
+            id="clear-query"
+        >
+            Clear
+        </button>
+    </div>
+
+
+    <div class="card">
+        <h3>Boolean Logic</h3>
+
+        <p>
+            Combine search terms using Boolean operators.
+        </p>
+
+        <div class="grid">
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert=" AND "
+            >
+                AND
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert=" OR "
+            >
+                OR
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert=" NOT "
+            >
+                NOT
+            </button>
+
+        </div>
+
+        <p>
+            Example:
+            <code>python AND programming NOT java</code>
+        </p>
+    </div>
+
+
+    <div class="card">
+        <h3>Fields</h3>
+
+        <p>
+            Restrict a term to a specific field.
+        </p>
+
+        <div class="grid">
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="title:"
+            >
+                title:
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="category:"
+            >
+                category:
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="author:"
+            >
+                author:
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="tag:"
+            >
+                tag:
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="language:"
+            >
+                language:
+            </button>
+
+        </div>
+
+        <p>
+            Example:
+            <code>title:python category:technology</code>
+        </p>
+    </div>
+
+
+    <div class="card">
+        <h3>Exact Phrases</h3>
+
+        <p>
+            Put multiple words inside quotation marks
+            when they should be treated as one phrase.
+        </p>
+
+        <button
+            type="button"
+            class="query-helper"
+            data-insert='"search engine"'
+        >
+            Insert phrase
+        </button>
+
+        <p>
+            Example:
+            <code>"machine learning"</code>
+        </p>
+    </div>
+
+
+    <div class="card">
+        <h3>Fuzzy Search</h3>
+
+        <p>
+            Allow approximate matching for terms where
+            spelling may vary.
+        </p>
+
+        <button
+            type="button"
+            class="query-helper"
+            data-insert="~"
+        >
+            Add fuzzy operator
+        </button>
+
+        <p>
+            Example:
+            <code>programing~</code>
+        </p>
+    </div>
+
+
+    <div class="card">
+        <h3>Term Boosting</h3>
+
+        <p>
+            Increase the importance of an individual term.
+        </p>
+
+        <div class="grid">
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="^2"
+            >
+                Boost ×2
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="^3"
+            >
+                Boost ×3
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="^5"
+            >
+                Boost ×5
+            </button>
+
+        </div>
+
+        <p>
+            Example:
+            <code>python^3</code>
+        </p>
+    </div>
+
+
+    <div class="card">
+        <h3>Range Queries</h3>
+
+        <p>
+            Search numeric or comparable values using
+            comparison operators.
+        </p>
+
+        <div class="grid">
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="date>"
+            >
+                date &gt;
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="date>="
+            >
+                date &gt;=
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="date<"
+            >
+                date &lt;
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="date<="
+            >
+                date &lt;=
+            </button>
+
+            <button
+                type="button"
+                class="query-helper"
+                data-insert="date="
+            >
+                date =
+            </button>
+
+        </div>
+
+        <p>
+            Example:
+            <code>date&gt;=2025</code>
+        </p>
+    </div>
+
+
+    <div class="card">
+        <h3>Filters</h3>
+
+        <div class="grid">
+
+            <div>
+                <label for="category-filter">
+                    Category
+                </label>
+
+                <input
+                    id="category-filter"
+                    type="text"
+                    name="category"
+                    placeholder="technology"
+                >
+            </div>
+
+            <div>
+                <label for="tag-filter">
+                    Tag
+                </label>
+
+                <input
+                    id="tag-filter"
+                    type="text"
+                    name="tag"
+                    placeholder="python"
+                >
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="card">
+        <h3>Sorting</h3>
+
+        <div class="grid">
+
+            <div>
+                <label for="sort-field">
+                    Sort field
+                </label>
+
+                <select
+                    id="sort-field"
+                    name="sort_field"
+                >
+                    <option value="relevance">
+                        Relevance
+                    </option>
+
+                    <option value="date">
+                        Date
+                    </option>
+
+                    <option value="title">
+                        Title
+                    </option>
+
+                    <option value="created_at">
+                        Created
+                    </option>
+                </select>
+            </div>
+
+            <div>
+                <label for="sort-direction">
+                    Direction
+                </label>
+
+                <select
+                    id="sort-direction"
+                    name="sort_direction"
+                >
+                    <option value="desc">
+                        Descending
+                    </option>
+
+                    <option value="asc">
+                        Ascending
+                    </option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="card">
+        <h3>Pagination</h3>
+
+        <div class="grid">
+
+            <div>
+                <label for="offset">
+                    Offset
+                </label>
+
+                <input
+                    id="offset"
+                    type="number"
+                    name="offset"
+                    value="0"
+                    min="0"
+                >
+            </div>
+
+            <div>
+                <label for="page-size">
+                    Page size
+                </label>
+
+                <input
+                    id="page-size"
+                    type="number"
+                    name="page_size"
+                    value="20"
+                    min="1"
+                    max="1000"
+                >
+            </div>
+
+        </div>
+    </div>
+
+</form>
+
+
+{% if parsed_query %}
+
+<div class="card">
+    <h2>🧠 Query Analysis</h2>
+
+    <p>
+        The backend interpreted your query as:
+    </p>
+
+    {% if parsed_query.intent %}
+        <p>
+            <strong>Intent:</strong>
+            {{ parsed_query.intent }}
+        </p>
+    {% endif %}
+
+    {% if parsed_query.complexity is defined %}
+        <p>
+            <strong>Complexity:</strong>
+            {{ parsed_query.complexity }}
+        </p>
+    {% endif %}
+
+    {% if parsed_query.terms %}
+        <h4>Terms</h4>
+
+        <div>
+            {% for term in parsed_query.terms %}
+                <span>{{ term }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if parsed_query.phrases %}
+        <h4>Phrases</h4>
+
+        <div>
+            {% for phrase in parsed_query.phrases %}
+                <span>{{ phrase }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if parsed_query.fields %}
+        <h4>Fields</h4>
+
+        <div>
+            {% for field in parsed_query.fields %}
+                <span>{{ field }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if parsed_query.operators %}
+        <h4>Operators</h4>
+
+        <div>
+            {% for operator in parsed_query.operators %}
+                <span>{{ operator }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+{% endif %}
+
+
+{% if results %}
+
+<div class="card">
+    <h2>Results</h2>
+
+    <p>
+        Found
+        <strong>{{ results|length }}</strong>
+        result(s).
+    </p>
+
+    {% for result in results %}
+
+    <div class="card">
+
+        <h3>
+            {{ result.title }}
+        </h3>
+
+        <p>
+            {{ result.content }}
+        </p>
+
+        {% if result.category %}
+            <p>
+                <strong>Category:</strong>
+                {{ result.category }}
+            </p>
+        {% endif %}
+
+        {% if result.score is defined %}
+            <p>
+                <strong>Score:</strong>
+                {{ result.score }}
+            </p>
+        {% endif %}
+
+        {% if result.tags %}
+            <p>
+                <strong>Tags:</strong>
+
+                {% for tag in result.tags %}
+                    #{{ tag }}
+                {% endfor %}
+            </p>
+        {% endif %}
+
+    </div>
+
+    {% endfor %}
+</div>
+
+{% endif %}
+
+
+<div class="card">
+    <h3>Query Examples</h3>
+
+    <div class="grid">
+
+        <button
+            type="button"
+            class="example-query"
+            data-query="python programming"
+        >
+            Basic search
+        </button>
+
+        <button
+            type="button"
+            class="example-query"
+            data-query='"machine learning"'
+        >
+            Exact phrase
+        </button>
+
+        <button
+            type="button"
+            class="example-query"
+            data-query="python AND programming"
+        >
+            Boolean AND
+        </button>
+
+        <button
+            type="button"
+            class="example-query"
+            data-query="python NOT java"
+        >
+            Boolean NOT
+        </button>
+
+        <button
+            type="button"
+            class="example-query"
+            data-query="title:python"
+        >
+            Field search
+        </button>
+
+        <button
+            type="button"
+            class="example-query"
+            data-query="category:technology"
+        >
+            Category search
+        </button>
+
+        <button
+            type="button"
+            class="example-query"
+            data-query="date>=2025"
+        >
+            Range search
+        </button>
+
+        <button
+            type="button"
+            class="example-query"
+            data-query="python^3 programming"
+        >
+            Boosted search
+        </button>
+
+    </div>
+</div>
+
+
+<script>
+(function () {
+    "use strict";
+
+    const queryBox =
+        document.getElementById("query");
+
+    const clearButton =
+        document.getElementById("clear-query");
+
+    const form =
+        document.getElementById("advanced-search-form");
+
+    if (!queryBox || !form) {
+        return;
+    }
+
+    function insertAtCursor(text) {
+        const start = queryBox.selectionStart;
+        const end = queryBox.selectionEnd;
+
+        const before =
+            queryBox.value.slice(0, start);
+
+        const after =
+            queryBox.value.slice(end);
+
+        queryBox.value =
+            before + text + after;
+
+        const cursor =
+            start + text.length;
+
+        queryBox.focus();
+
+        queryBox.setSelectionRange(
+            cursor,
+            cursor
+        );
+    }
+
+    document
+        .querySelectorAll(".query-helper")
+        .forEach(function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const value =
+                        button.dataset.insert;
+
+                    if (value) {
+                        insertAtCursor(value);
+                    }
+                }
+            );
+        });
+
+    document
+        .querySelectorAll(".example-query")
+        .forEach(function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    queryBox.value =
+                        button.dataset.query;
+
+                    queryBox.focus();
+                }
+            );
+        });
+
+    if (clearButton) {
+
+        clearButton.addEventListener(
+            "click",
+            function () {
+
+                queryBox.value = "";
+
+                queryBox.focus();
+            }
+        );
+    }
+
+    form.addEventListener(
+        "submit",
+        function () {
+
+            const limit =
+                document.getElementById("limit");
+
+            const pageSize =
+                document.getElementById("page-size");
+
+            if (limit && pageSize) {
+                pageSize.value =
+                    limit.value;
+            }
+        }
+    );
+})();
+</script>
+
+{% endblock %}
