@@ -1,0 +1,1881 @@
+{% extends "base.html" %}
+
+{% block title %}
+Search Filters
+{% endblock %}
+
+{% block content %}
+
+<div class="card search-filter-panel">
+
+    <div class="filter-header">
+
+        <div>
+            <h2>🎛️ Search Filters</h2>
+
+            <p>
+                Narrow search results using structured
+                filters before the search backend ranks
+                the results.
+            </p>
+        </div>
+
+        <div class="filter-status">
+
+            <span>
+                Active filters:
+            </span>
+
+            <strong id="active-filter-count">
+                0
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SEARCH CONTEXT
+========================================================= -->
+
+<div class="card">
+
+    <h3>🔎 Search Context</h3>
+
+    <p>
+        Filters are applied to the current search query.
+    </p>
+
+    <form
+        id="search-filter-form"
+        action="/search"
+        method="POST"
+    >
+
+        <div class="filter-field">
+
+            <label for="filter-query">
+                Search query
+            </label>
+
+            <input
+                id="filter-query"
+                name="query"
+                type="text"
+                value="{{ query|default('') }}"
+                placeholder="Enter your search..."
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <input
+            type="hidden"
+            name="filter_mode"
+            value="advanced"
+        >
+
+
+        <!-- =====================================================
+             CATEGORY
+        ====================================================== -->
+
+        <section
+            class="filter-section"
+            data-filter-group="category"
+        >
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        📁 Category
+                    </h3>
+
+                    <p>
+                        Restrict results to one or more
+                        categories.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="toggle-filter-section"
+                    aria-expanded="true"
+                >
+                    Collapse
+                </button>
+
+            </div>
+
+
+            <div class="filter-section-content">
+
+                <div class="filter-search">
+
+                    <label for="category-search">
+                        Find category
+                    </label>
+
+                    <input
+                        id="category-search"
+                        type="search"
+                        placeholder="Filter categories..."
+                        autocomplete="off"
+                        data-filter-search="category"
+                    >
+
+                </div>
+
+
+                <div
+                    class="filter-options"
+                    id="category-options"
+                >
+
+                    {% if categories %}
+
+                        {% for category in categories %}
+
+                        <label
+                            class="filter-option"
+                            data-filter-value="{{ category|lower }}"
+                        >
+
+                            <input
+                                type="checkbox"
+                                name="category"
+                                value="{{ category }}"
+                                {% if selected_categories
+                                   and category in selected_categories %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <span>
+                                {{ category }}
+                            </span>
+
+                            {% if category_counts
+                               and category in category_counts %}
+
+                            <small>
+                                {{ category_counts[category] }}
+                            </small>
+
+                            {% endif %}
+
+                        </label>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <p>
+                            No categories are currently available.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             TAGS
+        ====================================================== -->
+
+        <section
+            class="filter-section"
+            data-filter-group="tags"
+        >
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        🏷️ Tags
+                    </h3>
+
+                    <p>
+                        Restrict results by indexed tags.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="toggle-filter-section"
+                    aria-expanded="true"
+                >
+                    Collapse
+                </button>
+
+            </div>
+
+
+            <div class="filter-section-content">
+
+                <div class="filter-search">
+
+                    <label for="tag-search">
+                        Find tags
+                    </label>
+
+                    <input
+                        id="tag-search"
+                        type="search"
+                        placeholder="Search tags..."
+                        autocomplete="off"
+                        data-filter-search="tag"
+                    >
+
+                </div>
+
+
+                <div
+                    class="filter-options"
+                    id="tag-options"
+                >
+
+                    {% if tags %}
+
+                        {% for tag in tags %}
+
+                        <label
+                            class="filter-option"
+                            data-filter-value="{{ tag|lower }}"
+                        >
+
+                            <input
+                                type="checkbox"
+                                name="tags"
+                                value="{{ tag }}"
+                                {% if selected_tags
+                                   and tag in selected_tags %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <span>
+                                #{{ tag }}
+                            </span>
+
+                            {% if tag_counts
+                               and tag in tag_counts %}
+
+                            <small>
+                                {{ tag_counts[tag] }}
+                            </small>
+
+                            {% endif %}
+
+                        </label>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <p>
+                            No tags are currently available.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             TYPE
+        ====================================================== -->
+
+        <section
+            class="filter-section"
+            data-filter-group="type"
+        >
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        🧩 Content Type
+                    </h3>
+
+                    <p>
+                        Restrict results to a particular
+                        type of indexed content.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="toggle-filter-section"
+                    aria-expanded="true"
+                >
+                    Collapse
+                </button>
+
+            </div>
+
+
+            <div class="filter-section-content">
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="content_type"
+                        value=""
+                        {% if not selected_type %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <span>
+                        All types
+                    </span>
+
+                </label>
+
+
+                {% set content_types = [
+                    "document",
+                    "note",
+                    "research",
+                    "memory",
+                    "article",
+                    "webpage"
+                ] %}
+
+
+                {% for type in content_types %}
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="content_type"
+                        value="{{ type }}"
+                        {% if selected_type == type %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <span>
+                        {{ type|capitalize }}
+                    </span>
+
+                </label>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             DATE FILTER
+        ====================================================== -->
+
+        <section
+            class="filter-section"
+            data-filter-group="date"
+        >
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        📅 Date
+                    </h3>
+
+                    <p>
+                        Restrict results by creation or
+                        update date.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="toggle-filter-section"
+                    aria-expanded="true"
+                >
+                    Collapse
+                </button>
+
+            </div>
+
+
+            <div class="filter-section-content">
+
+                <div class="grid">
+
+                    <div class="filter-field">
+
+                        <label for="date-from">
+                            From
+                        </label>
+
+                        <input
+                            id="date-from"
+                            type="date"
+                            name="date_from"
+                            value="{{ date_from|default('') }}"
+                        >
+
+                    </div>
+
+
+                    <div class="filter-field">
+
+                        <label for="date-to">
+                            To
+                        </label>
+
+                        <input
+                            id="date-to"
+                            type="date"
+                            name="date_to"
+                            value="{{ date_to|default('') }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="date-presets">
+
+                    <button
+                        type="button"
+                        class="date-preset"
+                        data-days="1"
+                    >
+                        Last 24 hours
+                    </button>
+
+                    <button
+                        type="button"
+                        class="date-preset"
+                        data-days="7"
+                    >
+                        Last 7 days
+                    </button>
+
+                    <button
+                        type="button"
+                        class="date-preset"
+                        data-days="30"
+                    >
+                        Last 30 days
+                    </button>
+
+                    <button
+                        type="button"
+                        class="date-preset"
+                        data-days="90"
+                    >
+                        Last 90 days
+                    </button>
+
+                    <button
+                        type="button"
+                        class="date-preset"
+                        data-days="365"
+                    >
+                        Last year
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             DATE FIELD
+        ====================================================== -->
+
+        <section
+            class="filter-section"
+            data-filter-group="date-field"
+        >
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        🕒 Date Field
+                    </h3>
+
+                    <p>
+                        Choose which indexed timestamp
+                        the date filter applies to.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="filter-section-content">
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="date_field"
+                        value="created_at"
+                        checked
+                    >
+
+                    <span>
+                        Created
+                    </span>
+
+                </label>
+
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="date_field"
+                        value="updated_at"
+                    >
+
+                    <span>
+                        Updated
+                    </span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             RELEVANCE
+        ====================================================== -->
+
+        <section
+            class="filter-section"
+            data-filter-group="relevance"
+        >
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        ⭐ Relevance
+                    </h3>
+
+                    <p>
+                        Set the minimum relevance score
+                        accepted by the frontend.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="filter-section-content">
+
+                <div class="filter-field">
+
+                    <label for="minimum-score">
+                        Minimum score
+                    </label>
+
+                    <input
+                        id="minimum-score"
+                        type="number"
+                        name="minimum_score"
+                        min="0"
+                        step="0.1"
+                        value="{{ minimum_score|default('') }}"
+                        placeholder="No minimum"
+                    >
+
+                </div>
+
+
+                <div class="score-presets">
+
+                    <button
+                        type="button"
+                        class="score-preset"
+                        data-score="0"
+                    >
+                        Any
+                    </button>
+
+                    <button
+                        type="button"
+                        class="score-preset"
+                        data-score="5"
+                    >
+                        5+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="score-preset"
+                        data-score="10"
+                    >
+                        10+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="score-preset"
+                        data-score="20"
+                    >
+                        20+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="score-preset"
+                        data-score="50"
+                    >
+                        50+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             FILTER LOGIC
+        ====================================================== -->
+
+        <section
+            class="filter-section"
+            data-filter-group="logic"
+        >
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        🔗 Filter Logic
+                    </h3>
+
+                    <p>
+                        Decide how multiple selected filters
+                        should be combined.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="filter-section-content">
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="filter_logic"
+                        value="AND"
+                        checked
+                    >
+
+                    <span>
+                        Match all filters
+                    </span>
+
+                </label>
+
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="filter_logic"
+                        value="OR"
+                    >
+
+                    <span>
+                        Match any filter
+                    </span>
+
+                </label>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             SORTING
+        ====================================================== -->
+
+        <section
+            class="filter-section"
+            data-filter-group="sorting"
+        >
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        ↕️ Result Ordering
+                    </h3>
+
+                    <p>
+                        Choose the order in which results
+                        should be returned.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid">
+
+                <div class="filter-field">
+
+                    <label for="sort-field">
+                        Sort by
+                    </label>
+
+                    <select
+                        id="sort-field"
+                        name="sort_field"
+                    >
+
+                        <option value="relevance">
+                            Relevance
+                        </option>
+
+                        <option value="created_at">
+                            Created
+                        </option>
+
+                        <option value="updated_at">
+                            Updated
+                        </option>
+
+                        <option value="title">
+                            Title
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="filter-field">
+
+                    <label for="sort-direction">
+                        Direction
+                    </label>
+
+                    <select
+                        id="sort-direction"
+                        name="sort_direction"
+                    >
+
+                        <option value="desc">
+                            Descending
+                        </option>
+
+                        <option value="asc">
+                            Ascending
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PAGINATION
+        ====================================================== -->
+
+        <section
+            class="filter-section"
+            data-filter-group="pagination"
+        >
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        📄 Results Per Page
+                    </h3>
+
+                    <p>
+                        Control how many results the backend
+                        should return.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="filter-section-content">
+
+                <select
+                    name="limit"
+                    id="result-limit"
+                >
+
+                    <option value="10">
+                        10 results
+                    </option>
+
+                    <option value="20" selected>
+                        20 results
+                    </option>
+
+                    <option value="50">
+                        50 results
+                    </option>
+
+                    <option value="100">
+                        100 results
+                    </option>
+
+                    <option value="250">
+                        250 results
+                    </option>
+
+                    <option value="500">
+                        500 results
+                    </option>
+
+                </select>
+
+
+                <label for="result-offset">
+                    Offset
+                </label>
+
+                <input
+                    id="result-offset"
+                    type="number"
+                    name="offset"
+                    min="0"
+                    value="{{ offset|default(0) }}"
+                >
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             ACTIVE FILTERS
+        ====================================================== -->
+
+        <section class="card active-filters">
+
+            <div class="filter-section-header">
+
+                <div>
+
+                    <h3>
+                        Active Filters
+                    </h3>
+
+                    <p>
+                        Review the filters currently selected.
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="clear-all-filters"
+                >
+                    Clear All
+                </button>
+
+            </div>
+
+
+            <div
+                id="active-filter-list"
+                class="active-filter-list"
+            >
+
+                <p id="no-active-filters">
+                    No filters selected.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             ACTIONS
+        ====================================================== -->
+
+        <div class="card filter-actions">
+
+            <button
+                type="submit"
+                id="apply-filters"
+            >
+                🔎 Apply Filters
+            </button>
+
+
+            <button
+                type="button"
+                id="preview-filters"
+            >
+                Preview
+            </button>
+
+
+            <button
+                type="button"
+                id="reset-filters"
+            >
+                Reset
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<!-- =========================================================
+     FILTER PREVIEW
+========================================================= -->
+
+<div
+    id="filter-preview"
+    class="card"
+    hidden
+>
+
+    <h3>
+        Filter Preview
+    </h3>
+
+    <p>
+        These values will be sent to the search backend.
+    </p>
+
+    <pre id="filter-preview-output"></pre>
+
+</div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+(function () {
+
+    "use strict";
+
+
+    const form =
+        document.getElementById(
+            "search-filter-form"
+        );
+
+    const activeCount =
+        document.getElementById(
+            "active-filter-count"
+        );
+
+    const activeList =
+        document.getElementById(
+            "active-filter-list"
+        );
+
+    const noActive =
+        document.getElementById(
+            "no-active-filters"
+        );
+
+    const clearAll =
+        document.getElementById(
+            "clear-all-filters"
+        );
+
+    const resetButton =
+        document.getElementById(
+            "reset-filters"
+        );
+
+    const previewButton =
+        document.getElementById(
+            "preview-filters"
+        );
+
+    const preview =
+        document.getElementById(
+            "filter-preview"
+        );
+
+    const previewOutput =
+        document.getElementById(
+            "filter-preview-output"
+        );
+
+
+    if (!form) {
+        return;
+    }
+
+
+    /* ========================================================
+       FILTER COUNT
+    ======================================================== */
+
+    function getActiveControls() {
+
+        const controls =
+            Array.from(
+                form.querySelectorAll(
+                    "input, select"
+                )
+            );
+
+        return controls.filter(
+            function (control) {
+
+                if (
+                    control.type === "hidden"
+                ) {
+                    return false;
+                }
+
+                if (
+                    control.type === "radio" &&
+                    !control.checked
+                ) {
+                    return false;
+                }
+
+                if (
+                    control.type === "checkbox" &&
+                    !control.checked
+                ) {
+                    return false;
+                }
+
+                if (
+                    control.name === "query"
+                ) {
+                    return false;
+                }
+
+                if (
+                    control.value === ""
+                ) {
+                    return false;
+                }
+
+                return true;
+
+            }
+        );
+
+    }
+
+
+    function updateActiveCount() {
+
+        const controls =
+            getActiveControls();
+
+        if (activeCount) {
+
+            activeCount.textContent =
+                controls.length;
+
+        }
+
+    }
+
+
+    /* ========================================================
+       ACTIVE FILTER DISPLAY
+    ======================================================== */
+
+    function updateActiveFilters() {
+
+        if (!activeList) {
+            return;
+        }
+
+        activeList.innerHTML = "";
+
+        const controls =
+            getActiveControls();
+
+        if (!controls.length) {
+
+            if (noActive) {
+
+                noActive.hidden =
+                    false;
+
+                activeList.appendChild(
+                    noActive
+                );
+
+            }
+
+            updateActiveCount();
+
+            return;
+
+        }
+
+
+        if (noActive) {
+            noActive.hidden = true;
+        }
+
+
+        controls.forEach(
+            function (control) {
+
+                const item =
+                    document.createElement(
+                        "div"
+                    );
+
+                item.className =
+                    "active-filter-item";
+
+
+                const label =
+                    document.createElement(
+                        "span"
+                    );
+
+                label.textContent =
+                    control.name +
+                    ": " +
+                    control.value;
+
+
+                const remove =
+                    document.createElement(
+                        "button"
+                    );
+
+                remove.type =
+                    "button";
+
+                remove.textContent =
+                    "Remove";
+
+
+                remove.addEventListener(
+                    "click",
+                    function () {
+
+                        if (
+                            control.type ===
+                            "radio"
+                        ) {
+
+                            return;
+
+                        }
+
+                        control.checked =
+                            false;
+
+                        if (
+                            control.tagName ===
+                            "SELECT"
+                        ) {
+
+                            control.selectedIndex =
+                                0;
+
+                        }
+
+                        if (
+                            control.type !==
+                            "checkbox"
+                        ) {
+
+                            control.value =
+                                "";
+
+                        }
+
+                        updateActiveFilters();
+
+                    }
+                );
+
+
+                item.appendChild(
+                    label
+                );
+
+                item.appendChild(
+                    remove
+                );
+
+                activeList.appendChild(
+                    item
+                );
+
+            }
+        );
+
+
+        updateActiveCount();
+
+    }
+
+
+    /* ========================================================
+       CATEGORY / TAG SEARCH
+    ======================================================== */
+
+    function attachFilterSearch(
+        input
+    ) {
+
+        const target =
+            input.dataset.filterSearch;
+
+        if (!target) {
+            return;
+        }
+
+        input.addEventListener(
+            "input",
+            function () {
+
+                const value =
+                    input.value
+                        .toLowerCase()
+                        .trim();
+
+
+                const group =
+                    input.closest(
+                        ".filter-section"
+                    );
+
+                if (!group) {
+                    return;
+                }
+
+
+                const options =
+                    group.querySelectorAll(
+                        ".filter-option[data-filter-value]"
+                    );
+
+
+                options.forEach(
+                    function (option) {
+
+                        const optionValue =
+                            option.dataset
+                                .filterValue
+                                .toLowerCase();
+
+                        option.hidden =
+                            value !== "" &&
+                            !optionValue.includes(
+                                value
+                            );
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-filter-search]"
+        )
+        .forEach(
+            attachFilterSearch
+        );
+
+
+    /* ========================================================
+       COLLAPSIBLE FILTER GROUPS
+    ======================================================== */
+
+    document
+        .querySelectorAll(
+            ".toggle-filter-section"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const section =
+                            button.closest(
+                                ".filter-section"
+                            );
+
+                        if (!section) {
+                            return;
+                        }
+
+
+                        const content =
+                            section.querySelector(
+                                ".filter-section-content"
+                            );
+
+                        if (!content) {
+                            return;
+                        }
+
+
+                        const expanded =
+                            button.getAttribute(
+                                "aria-expanded"
+                            ) === "true";
+
+
+                        button.setAttribute(
+                            "aria-expanded",
+                            expanded
+                                ? "false"
+                                : "true"
+                        );
+
+
+                        content.hidden =
+                            expanded;
+
+
+                        button.textContent =
+                            expanded
+                                ? "Expand"
+                                : "Collapse";
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* ========================================================
+       DATE PRESETS
+    ======================================================== */
+
+    document
+        .querySelectorAll(
+            ".date-preset"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const days =
+                            Number(
+                                button.dataset.days
+                            );
+
+                        if (!days) {
+                            return;
+                        }
+
+
+                        const now =
+                            new Date();
+
+                        const start =
+                            new Date(now);
+
+                        start.setDate(
+                            start.getDate() -
+                            days
+                        );
+
+
+                        const formatDate =
+                            function (date) {
+
+                                const year =
+                                    date.getFullYear();
+
+                                const month =
+                                    String(
+                                        date.getMonth() + 1
+                                    ).padStart(
+                                        2,
+                                        "0"
+                                    );
+
+                                const day =
+                                    String(
+                                        date.getDate()
+                                    ).padStart(
+                                        2,
+                                        "0"
+                                    );
+
+                                return (
+                                    year +
+                                    "-" +
+                                    month +
+                                    "-" +
+                                    day
+                                );
+
+                            };
+
+
+                        const from =
+                            document.getElementById(
+                                "date-from"
+                            );
+
+                        const to =
+                            document.getElementById(
+                                "date-to"
+                            );
+
+
+                        if (from) {
+                            from.value =
+                                formatDate(start);
+                        }
+
+                        if (to) {
+                            to.value =
+                                formatDate(now);
+                        }
+
+
+                        updateActiveFilters();
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* ========================================================
+       SCORE PRESETS
+    ======================================================== */
+
+    document
+        .querySelectorAll(
+            ".score-preset"
+        )
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const score =
+                            button.dataset.score;
+
+                        const input =
+                            document.getElementById(
+                                "minimum-score"
+                            );
+
+                        if (!input) {
+                            return;
+                        }
+
+                        input.value =
+                            score === "0"
+                                ? ""
+                                : score;
+
+                        updateActiveFilters();
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* ========================================================
+       CLEAR FILTERS
+    ======================================================== */
+
+    function clearFilters() {
+
+        form
+            .querySelectorAll(
+                "input[type='checkbox']"
+            )
+            .forEach(
+                function (input) {
+                    input.checked = false;
+                }
+            );
+
+
+        form
+            .querySelectorAll(
+                "input[type='text'], input[type='search'], input[type='date'], input[type='number']"
+            )
+            .forEach(
+                function (input) {
+
+                    if (
+                        input.name ===
+                        "query"
+                    ) {
+                        return;
+                    }
+
+                    input.value = "";
+
+                }
+            );
+
+
+        form
+            .querySelectorAll(
+                "select"
+            )
+            .forEach(
+                function (select) {
+
+                    select.selectedIndex =
+                        0;
+
+                }
+            );
+
+
+        const allType =
+            form.querySelector(
+                "input[name='content_type'][value='']"
+            );
+
+        if (allType) {
+            allType.checked = true;
+        }
+
+
+        const andLogic =
+            form.querySelector(
+                "input[name='filter_logic'][value='AND']"
+            );
+
+        if (andLogic) {
+            andLogic.checked = true;
+        }
+
+
+        const created =
+            form.querySelector(
+                "input[name='date_field'][value='created_at']"
+            );
+
+        if (created) {
+            created.checked = true;
+        }
+
+
+        updateActiveFilters();
+
+    }
+
+
+    if (clearAll) {
+
+        clearAll.addEventListener(
+            "click",
+            clearFilters
+        );
+
+    }
+
+
+    if (resetButton) {
+
+        resetButton.addEventListener(
+            "click",
+            clearFilters
+        );
+
+    }
+
+
+    /* ========================================================
+       FILTER PREVIEW
+    ======================================================== */
+
+    function buildPreview() {
+
+        const formData =
+            new FormData(form);
+
+        const output = {};
+
+        formData.forEach(
+            function (value, key) {
+
+                if (
+                    output[key] === undefined
+                ) {
+
+                    output[key] =
+                        value;
+
+                    return;
+
+                }
+
+
+                if (
+                    !Array.isArray(
+                        output[key]
+                    )
+                ) {
+
+                    output[key] = [
+                        output[key]
+                    ];
+
+                }
+
+
+                output[key].push(
+                    value
+                );
+
+            }
+        );
+
+
+        return output;
+
+    }
+
+
+    if (previewButton) {
+
+        previewButton.addEventListener(
+            "click",
+            function () {
+
+                if (!preview ||
+                    !previewOutput) {
+                    return;
+                }
+
+
+                const data =
+                    buildPreview();
+
+
+                previewOutput.textContent =
+                    JSON.stringify(
+                        data,
+                        null,
+                        2
+                    );
+
+
+                preview.hidden =
+                    false;
+
+
+                preview.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            }
+        );
+
+    }
+
+
+    /* ========================================================
+       FORM EVENTS
+    ======================================================== */
+
+    form
+        .querySelectorAll(
+            "input, select"
+        )
+        .forEach(
+            function (control) {
+
+                control.addEventListener(
+                    "change",
+                    updateActiveFilters
+                );
+
+            }
+        );
+
+
+    form.addEventListener(
+        "submit",
+        function () {
+
+            /*
+             * The frontend deliberately sends structured
+             * filter fields rather than trying to reproduce
+             * backend filtering logic in JavaScript.
+             *
+             * The /search route can translate these values
+             * into QueryFilter objects or query syntax.
+             */
+
+            updateActiveFilters();
+
+        }
+    );
+
+
+    /* ========================================================
+       INITIALISE
+    ======================================================== */
+
+    updateActiveFilters();
+
+})();
+</script>
+
+
+<!-- =========================================================
+     BACKEND CONTRACT
+========================================================= -->
+
+<div class="card">
+
+    <h3>⚙️ Search Filter Backend</h3>
+
+    <p>
+        This component is designed to send structured
+        filter values to the existing search endpoint.
+        The backend remains responsible for interpreting
+        and applying those filters.
+    </p>
+
+    <div class="grid">
+
+        <div>
+            <strong>Categories</strong>
+
+            <p>
+                Can map to category filters.
+            </p>
+        </div>
+
+
+        <div>
+            <strong>Tags</strong>
+
+            <p>
+                Can map to tag filters.
+            </p>
+        </div>
+
+
+        <div>
+            <strong>Dates</strong>
+
+            <p>
+                Can map to range filters.
+            </p>
+        </div>
+
+
+        <div>
+            <strong>Scores</strong>
+
+            <p>
+                Can be applied after ranking or
+                translated into backend constraints.
+            </p>
+        </div>
+
+
+        <div>
+            <strong>Sorting</strong>
+
+            <p>
+                Can map to the Query sort specification.
+            </p>
+        </div>
+
+
+        <div>
+            <strong>Pagination</strong>
+
+            <p>
+                Can map directly to Query pagination.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
