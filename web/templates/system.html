@@ -6,19 +6,13 @@ OurPlatform System
 
 {% block content %}
 
-<!-- =========================
-     SYSTEM HEADER
-========================= -->
-
 <div class="card">
 
-    <h2>
-        ⚙️ System Center
-    </h2>
+    <h2>⚙️ System Center</h2>
 
     <p>
-        Monitor the platform, inspect its
-        components, and view system status.
+        Monitor the platform and inspect
+        its registered components.
     </p>
 
 </div>
@@ -32,15 +26,18 @@ OurPlatform System
 
     <div class="card">
 
-        <h3>
-            🟢 Platform
-        </h3>
+        <h3>Platform</h3>
+
+        <strong>
+            {% if platform.running %}
+                🟢 Running
+            {% else %}
+                🔴 Stopped
+            {% endif %}
+        </strong>
 
         <p>
-            Status:
-            <strong>
-                {{ platform.running }}
-            </strong>
+            Current platform state.
         </p>
 
     </div>
@@ -48,9 +45,7 @@ OurPlatform System
 
     <div class="card">
 
-        <h3>
-            📦 Version
-        </h3>
+        <h3>Version</h3>
 
         <strong>
             {{ platform.version }}
@@ -65,16 +60,29 @@ OurPlatform System
 
     <div class="card">
 
-        <h3>
-            🧩 Components
-        </h3>
+        <h3>Components</h3>
 
         <strong>
             {{ platform.components|length }}
         </strong>
 
         <p>
-            Registered platform components.
+            Registered components.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Errors</h3>
+
+        <strong>
+            Available through system diagnostics
+        </strong>
+
+        <p>
+            Error monitoring is handled by Core.
         </p>
 
     </div>
@@ -88,15 +96,7 @@ OurPlatform System
 
 <div class="card">
 
-    <h2>
-        🧩 Platform Components
-    </h2>
-
-    <p>
-        Core services currently registered
-        with the platform.
-    </p>
-
+    <h2>🧩 Registered Components</h2>
 
     {% if platform.components %}
 
@@ -109,8 +109,7 @@ OurPlatform System
             </h3>
 
             <p>
-                Component registered with
-                the platform.
+                Registered with the platform.
             </p>
 
             <strong>
@@ -124,8 +123,7 @@ OurPlatform System
     {% else %}
 
         <p>
-            No components are currently
-            registered.
+            No components are registered.
         </p>
 
     {% endif %}
@@ -139,24 +137,20 @@ OurPlatform System
 
 <div class="card">
 
-    <h2>
-        📊 Platform Data
-    </h2>
+    <h2>📊 Platform Data</h2>
 
     <div class="grid">
 
         <div class="card">
 
-            <h3>
-                🧠 Memory
-            </h3>
+            <h3>🧠 Memory</h3>
 
             <strong>
                 {{ memory_count }}
             </strong>
 
             <p>
-                stored memories
+                Stored memories.
             </p>
 
         </div>
@@ -164,16 +158,14 @@ OurPlatform System
 
         <div class="card">
 
-            <h3>
-                🔎 Search
-            </h3>
+            <h3>🔎 Search</h3>
 
             <strong>
                 {{ search_count }}
             </strong>
 
             <p>
-                indexed items
+                Indexed items.
             </p>
 
         </div>
@@ -181,117 +173,14 @@ OurPlatform System
 
         <div class="card">
 
-            <h3>
-                🔬 Research
-            </h3>
+            <h3>🔬 Research</h3>
 
             <strong>
                 {{ research_count }}
             </strong>
 
             <p>
-                research tasks
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =========================
-     SYSTEM ARCHITECTURE
-========================= -->
-
-<div class="card">
-
-    <h2>
-        🏗️ Architecture
-    </h2>
-
-    <div class="grid">
-
-        <div class="card">
-
-            <h3>
-                Core
-            </h3>
-
-            <p>
-                Coordinates the main platform
-                components and lifecycle.
-            </p>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                Memory
-            </h3>
-
-            <p>
-                Provides storage and retrieval
-                for platform information.
-            </p>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                Search
-            </h3>
-
-            <p>
-                Provides indexing and
-                information retrieval.
-            </p>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                Research
-            </h3>
-
-            <p>
-                Manages research questions
-                and research tasks.
-            </p>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                AI Assistant
-            </h3>
-
-            <p>
-                Provides an interface for
-                intelligent interaction with
-                platform systems.
-            </p>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                Web
-            </h3>
-
-            <p>
-                Provides the browser-based
-                interface for the platform.
+                Research tasks.
             </p>
 
         </div>
@@ -307,9 +196,7 @@ OurPlatform System
 
 <div class="card">
 
-    <h2>
-        🚀 Platform Features
-    </h2>
+    <h2>🚀 Features</h2>
 
     {% if platform.features %}
 
@@ -324,17 +211,11 @@ OurPlatform System
 
             <p>
 
-                Status:
-
-                <strong>
-
-                    {% if enabled %}
-                        Enabled
-                    {% else %}
-                        Disabled
-                    {% endif %}
-
-                </strong>
+                {% if enabled %}
+                    🟢 Enabled
+                {% else %}
+                    🔴 Disabled
+                {% endif %}
 
             </p>
 
@@ -345,8 +226,7 @@ OurPlatform System
     {% else %}
 
         <p>
-            No feature information is
-            currently available.
+            No features are configured.
         </p>
 
     {% endif %}
@@ -355,43 +235,171 @@ OurPlatform System
 
 
 <!-- =========================
-     SYSTEM ROADMAP
+     COMMANDS
 ========================= -->
 
 <div class="card">
 
-    <h2>
-        🛠️ System Roadmap
-    </h2>
+    <h2>⌨️ Commands</h2>
+
+    {% if platform.commands %}
+
+        {% for command in platform.commands %}
+
+        <div class="card">
+
+            <h3>
+                {{ command }}
+            </h3>
+
+            <p>
+                Registered platform command.
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No commands are currently registered.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================
+     ARCHITECTURE
+========================= -->
+
+<div class="card">
+
+    <h2>🏗️ Architecture</h2>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>Core</h3>
+
+            <p>
+                Platform lifecycle, components,
+                events, commands, logging,
+                errors, and health checks.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Memory</h3>
+
+            <p>
+                Stores platform information.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Search</h3>
+
+            <p>
+                Indexes and retrieves information.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Research</h3>
+
+            <p>
+                Manages research tasks.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>Web</h3>
+
+            <p>
+                Provides the browser interface.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     HEALTH
+========================= -->
+
+<div class="card">
+
+    <h2>❤️ System Health</h2>
+
+    <p>
+        Core contains a built-in health-check
+        system for monitoring components and
+        platform errors.
+    </p>
+
+    <p>
+        The next step can expose that
+        information directly through this page.
+    </p>
+
+</div>
+
+
+<!-- =========================
+     FUTURE
+========================= -->
+
+<div class="card">
+
+    <h2>🛠️ System Roadmap</h2>
 
     <ul>
 
         <li>
-            Component health monitoring
+            Live health monitoring
         </li>
 
         <li>
-            Configuration management
+            Log viewer
         </li>
 
         <li>
-            Better system diagnostics
+            Error viewer
         </li>
 
         <li>
-            Logging
+            Component diagnostics
         </li>
 
         <li>
-            Error reporting
+            Command management
         </li>
 
         <li>
-            Performance monitoring
+            Event monitoring
         </li>
 
         <li>
-            Component management
+            Configuration controls
         </li>
 
     </ul>
