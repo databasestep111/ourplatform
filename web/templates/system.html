@@ -1,0 +1,415 @@
+{% extends "base.html" %}
+
+{% block title %}
+OurPlatform System
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================
+     SYSTEM HEADER
+========================= -->
+
+<div class="card">
+
+    <h2>
+        ⚙️ System Center
+    </h2>
+
+    <p>
+        Monitor the platform, inspect its
+        components, and view system status.
+    </p>
+
+</div>
+
+
+<!-- =========================
+     PLATFORM STATUS
+========================= -->
+
+<div class="grid">
+
+    <div class="card">
+
+        <h3>
+            🟢 Platform
+        </h3>
+
+        <p>
+            Status:
+            <strong>
+                {{ platform.running }}
+            </strong>
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            📦 Version
+        </h3>
+
+        <strong>
+            {{ platform.version }}
+        </strong>
+
+        <p>
+            Current platform version.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            🧩 Components
+        </h3>
+
+        <strong>
+            {{ platform.components|length }}
+        </strong>
+
+        <p>
+            Registered platform components.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     COMPONENTS
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🧩 Platform Components
+    </h2>
+
+    <p>
+        Core services currently registered
+        with the platform.
+    </p>
+
+
+    {% if platform.components %}
+
+        {% for component in platform.components %}
+
+        <div class="card">
+
+            <h3>
+                {{ component }}
+            </h3>
+
+            <p>
+                Component registered with
+                the platform.
+            </p>
+
+            <strong>
+                Loaded
+            </strong>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No components are currently
+            registered.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================
+     PLATFORM DATA
+========================= -->
+
+<div class="card">
+
+    <h2>
+        📊 Platform Data
+    </h2>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                🧠 Memory
+            </h3>
+
+            <strong>
+                {{ memory_count }}
+            </strong>
+
+            <p>
+                stored memories
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                🔎 Search
+            </h3>
+
+            <strong>
+                {{ search_count }}
+            </strong>
+
+            <p>
+                indexed items
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                🔬 Research
+            </h3>
+
+            <strong>
+                {{ research_count }}
+            </strong>
+
+            <p>
+                research tasks
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     SYSTEM ARCHITECTURE
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🏗️ Architecture
+    </h2>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                Core
+            </h3>
+
+            <p>
+                Coordinates the main platform
+                components and lifecycle.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Memory
+            </h3>
+
+            <p>
+                Provides storage and retrieval
+                for platform information.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Search
+            </h3>
+
+            <p>
+                Provides indexing and
+                information retrieval.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Research
+            </h3>
+
+            <p>
+                Manages research questions
+                and research tasks.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                AI Assistant
+            </h3>
+
+            <p>
+                Provides an interface for
+                intelligent interaction with
+                platform systems.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Web
+            </h3>
+
+            <p>
+                Provides the browser-based
+                interface for the platform.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     FEATURES
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🚀 Platform Features
+    </h2>
+
+    {% if platform.features %}
+
+        {% for name, enabled
+            in platform.features.items() %}
+
+        <div class="card">
+
+            <h3>
+                {{ name }}
+            </h3>
+
+            <p>
+
+                Status:
+
+                <strong>
+
+                    {% if enabled %}
+                        Enabled
+                    {% else %}
+                        Disabled
+                    {% endif %}
+
+                </strong>
+
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No feature information is
+            currently available.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================
+     SYSTEM ROADMAP
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🛠️ System Roadmap
+    </h2>
+
+    <ul>
+
+        <li>
+            Component health monitoring
+        </li>
+
+        <li>
+            Configuration management
+        </li>
+
+        <li>
+            Better system diagnostics
+        </li>
+
+        <li>
+            Logging
+        </li>
+
+        <li>
+            Error reporting
+        </li>
+
+        <li>
+            Performance monitoring
+        </li>
+
+        <li>
+            Component management
+        </li>
+
+    </ul>
+
+</div>
+
+
+{% if message %}
+
+<div class="card">
+
+    <h3>
+        {{ message }}
+    </h3>
+
+</div>
+
+{% endif %}
+
+
+{% endblock %}
