@@ -1,0 +1,534 @@
+{% extends "base.html" %}
+
+{% block title %}
+OurPlatform Memory
+{% endblock %}
+
+{% block content %}
+
+
+<!-- =========================
+     MEMORY HEADER
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🧠 Memory Center
+    </h2>
+
+    <p>
+        Store, organize, and manage
+        information used by OurPlatform.
+    </p>
+
+</div>
+
+
+<!-- =========================
+     MEMORY OVERVIEW
+========================= -->
+
+<div class="grid">
+
+    <div class="card">
+
+        <h3>
+            Total Memories
+        </h3>
+
+        <strong>
+            {{ memory_count }}
+        </strong>
+
+        <p>
+            Items currently stored
+            by the memory system.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            Indexed Memories
+        </h3>
+
+        <strong>
+            {{ search_count }}
+        </strong>
+
+        <p>
+            Items currently available
+            to the search system.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            Research Connections
+        </h3>
+
+        <strong>
+            {{ research_count }}
+        </strong>
+
+        <p>
+            Research tasks connected
+            to the platform.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     SAVE MEMORY
+========================= -->
+
+<div class="card">
+
+    <h2>
+        ➕ Add Memory
+    </h2>
+
+    <p>
+        Add information to the platform's
+        memory system.
+    </p>
+
+    <form
+        action="/remember"
+        method="POST"
+    >
+
+        <label>
+            Information
+        </label>
+
+        <textarea
+            name="text"
+            placeholder="Write something for OurPlatform to remember..."
+            required
+        ></textarea>
+
+
+        <button type="submit">
+            Save Memory
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- =========================
+     MEMORY TYPES
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🗂️ Memory Types
+    </h2>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                General
+            </h3>
+
+            <p>
+                General information stored
+                by the platform.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Research
+            </h3>
+
+            <p>
+                Questions and information
+                related to research.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Knowledge
+            </h3>
+
+            <p>
+                Useful information that
+                can be retrieved later.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                System
+            </h3>
+
+            <p>
+                Information related to
+                the platform itself.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MEMORY WORKFLOW
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🔄 Memory Workflow
+    </h2>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                1. Input
+            </h3>
+
+            <p>
+                Information enters the
+                memory system.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                2. Storage
+            </h3>
+
+            <p>
+                The memory system stores
+                the information.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                3. Indexing
+            </h3>
+
+            <p>
+                Information can be added
+                to the search index.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                4. Retrieval
+            </h3>
+
+            <p>
+                Stored information can
+                eventually be retrieved.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                5. Connection
+            </h3>
+
+            <p>
+                Memory can interact with
+                other platform systems.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     CONNECTED SYSTEMS
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🔗 Connected Systems
+    </h2>
+
+    <div class="grid">
+
+
+        <div class="card">
+
+            <h3>
+                🔎 Search
+            </h3>
+
+            <p>
+                Memory information can be
+                indexed and searched.
+            </p>
+
+            <strong>
+                {{ search_count }}
+            </strong>
+
+            <p>
+                indexed items
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                🔬 Research
+            </h3>
+
+            <p>
+                Research questions can be
+                stored as memory.
+            </p>
+
+            <strong>
+                {{ research_count }}
+            </strong>
+
+            <p>
+                research tasks
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                ⚙️ Core
+            </h3>
+
+            <p>
+                The core platform coordinates
+                the memory system.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MEMORY CAPABILITIES
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🚀 Memory Capabilities
+    </h2>
+
+    <div class="grid">
+
+
+        <div class="card">
+
+            <h3>
+                Storage
+            </h3>
+
+            <p>
+                Store useful information
+                inside the platform.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Retrieval
+            </h3>
+
+            <p>
+                Retrieve previously stored
+                information.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Search
+            </h3>
+
+            <p>
+                Make stored information
+                searchable.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Organization
+            </h3>
+
+            <p>
+                Organize information into
+                useful categories.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Connections
+            </h3>
+
+            <p>
+                Connect memories with
+                research and other systems.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Expansion
+            </h3>
+
+            <p>
+                Provide a foundation for
+                more advanced memory features.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     FUTURE FEATURES
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🛠️ Future Memory Features
+    </h2>
+
+    <ul>
+
+        <li>
+            Memory editing
+        </li>
+
+        <li>
+            Memory deletion
+        </li>
+
+        <li>
+            Categories
+        </li>
+
+        <li>
+            Tags
+        </li>
+
+        <li>
+            Memory timestamps
+        </li>
+
+        <li>
+            Memory importance
+        </li>
+
+        <li>
+            Memory search
+        </li>
+
+        <li>
+            Memory relationships
+        </li>
+
+        <li>
+            Research-linked memories
+        </li>
+
+        <li>
+            Better retrieval
+        </li>
+
+    </ul>
+
+</div>
+
+
+{% if message %}
+
+<div class="card">
+
+    <h3>
+        {{ message }}
+    </h3>
+
+</div>
+
+{% endif %}
+
+
+{% endblock %}
