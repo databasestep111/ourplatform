@@ -1,0 +1,1856 @@
+{% extends "base.html" %}
+
+{% block title %}
+Search Results
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================================================
+     SEARCH RESULTS EXPERIENCE
+========================================================= -->
+
+<div class="card search-results-page">
+
+    <div class="search-results-header">
+
+        <div>
+            <h2>🔎 Search Results</h2>
+
+            {% if query %}
+                <p>
+                    Results for
+                    <strong>{{ query }}</strong>
+                </p>
+            {% else %}
+                <p>
+                    Search results will appear here.
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="search-result-actions">
+
+            <a href="/search">
+                New Search
+            </a>
+
+            {% if query %}
+                <button
+                    type="button"
+                    id="copy-query"
+                >
+                    Copy Query
+                </button>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SEARCH STATUS
+========================================================= -->
+
+{% if query %}
+
+<div class="card">
+
+    <div class="search-status">
+
+        {% if results %}
+
+            <h3>
+                {{ results|length }} result{% if results|length != 1 %}s{% endif %}
+                found
+            </h3>
+
+            <p>
+                The search system returned matching
+                information from the connected index.
+            </p>
+
+        {% else %}
+
+            <h3>
+                No results found
+            </h3>
+
+            <p>
+                The search system did not find a result
+                matching this query.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     SEARCH ERROR
+========================================================= -->
+
+{% if search_error %}
+
+<div class="card search-error">
+
+    <h3>⚠️ Search Error</h3>
+
+    <p>
+        {{ search_error }}
+    </p>
+
+    <button
+        type="button"
+        onclick="window.location.reload()"
+    >
+        Try Again
+    </button>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     QUERY INTERPRETATION
+========================================================= -->
+
+{% if parsed_query %}
+
+<div class="card query-analysis">
+
+    <div class="section-header">
+
+        <div>
+            <h3>🧠 Query Interpretation</h3>
+
+            <p>
+                This is how the backend interpreted
+                your search.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            id="toggle-query-analysis"
+        >
+            Details
+        </button>
+
+    </div>
+
+
+    <div
+        id="query-analysis-content"
+        class="analysis-content"
+    >
+
+        {% if parsed_query.intent %}
+
+        <div class="analysis-item">
+
+            <strong>
+                Intent
+            </strong>
+
+            <span>
+                {{ parsed_query.intent }}
+            </span>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if parsed_query.terms %}
+
+        <div class="analysis-item">
+
+            <strong>
+                Terms
+            </strong>
+
+            <div class="analysis-values">
+
+                {% for term in parsed_query.terms %}
+
+                <span class="analysis-chip">
+                    {{ term }}
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if parsed_query.phrases %}
+
+        <div class="analysis-item">
+
+            <strong>
+                Exact Phrases
+            </strong>
+
+            <div class="analysis-values">
+
+                {% for phrase in parsed_query.phrases %}
+
+                <span class="analysis-chip">
+                    "{{ phrase }}"
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if parsed_query.fields %}
+
+        <div class="analysis-item">
+
+            <strong>
+                Fields
+            </strong>
+
+            <div class="analysis-values">
+
+                {% for field in parsed_query.fields %}
+
+                <span class="analysis-chip">
+                    {{ field }}
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if parsed_query.operators %}
+
+        <div class="analysis-item">
+
+            <strong>
+                Boolean Operators
+            </strong>
+
+            <div class="analysis-values">
+
+                {% for operator in parsed_query.operators %}
+
+                <span class="analysis-chip">
+                    {{ operator }}
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if parsed_query.filters %}
+
+        <div class="analysis-item">
+
+            <strong>
+                Filters
+            </strong>
+
+            <div class="analysis-values">
+
+                {% for filter in parsed_query.filters %}
+
+                <span class="analysis-chip">
+
+                    {{ filter.field }}
+
+                    {{ filter.operator }}
+
+                    {{ filter.value }}
+
+                </span>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if parsed_query.sorting %}
+
+        <div class="analysis-item">
+
+            <strong>
+                Sorting
+            </strong>
+
+            <span>
+                {{ parsed_query.sorting.field }}
+
+                {{ parsed_query.sorting.direction }}
+            </span>
+
+        </div>
+
+        {% endif %}
+
+
+        {% if parsed_query.complexity is defined %}
+
+        <div class="analysis-item">
+
+            <strong>
+                Query Complexity
+            </strong>
+
+            <span>
+                {{ parsed_query.complexity }}
+            </span>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     ACTIVE SEARCH CONTROLS
+========================================================= -->
+
+{% if results %}
+
+<div class="card">
+
+    <div class="results-toolbar">
+
+        <div>
+
+            <strong>
+                Result Controls
+            </strong>
+
+            <p>
+                Change how returned results are displayed.
+            </p>
+
+        </div>
+
+
+        <div class="toolbar-controls">
+
+            <label for="result-sort">
+                Sort
+            </label>
+
+            <select id="result-sort">
+
+                <option value="relevance">
+                    Relevance
+                </option>
+
+                <option value="score-desc">
+                    Highest Score
+                </option>
+
+                <option value="score-asc">
+                    Lowest Score
+                </option>
+
+                <option value="title-asc">
+                    Title A-Z
+                </option>
+
+                <option value="title-desc">
+                    Title Z-A
+                </option>
+
+            </select>
+
+
+            <label for="result-density">
+                View
+            </label>
+
+            <select id="result-density">
+
+                <option value="comfortable">
+                    Comfortable
+                </option>
+
+                <option value="compact">
+                    Compact
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     RESULT SUMMARY
+========================================================= -->
+
+{% if results %}
+
+<div class="card">
+
+    <div class="result-summary">
+
+        <div>
+
+            <strong>
+                {{ results|length }}
+            </strong>
+
+            <span>
+                returned
+            </span>
+
+        </div>
+
+
+        {% set scored_results = results
+            |selectattr("score", "defined")
+            |list
+        %}
+
+        {% if scored_results %}
+
+        <div>
+
+            <strong>
+                {{ scored_results|length }}
+            </strong>
+
+            <span>
+                scored
+            </span>
+
+        </div>
+
+        {% endif %}
+
+
+        <div>
+
+            <strong>
+                {{ results|selectattr("category", "defined")|list|length }}
+            </strong>
+
+            <span>
+                categorized
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     RESULTS
+========================================================= -->
+
+{% if results %}
+
+<div
+    id="search-results"
+    class="search-results"
+    aria-live="polite"
+>
+
+    {% for result in results %}
+
+    <article
+        class="card search-result"
+        data-result-index="{{ loop.index0 }}"
+        data-score="{{ result.score|default(0) }}"
+        data-title="{{ result.title|default('')|lower }}"
+    >
+
+        <!-- Result header -->
+
+        <div class="result-header">
+
+            <div class="result-title-area">
+
+                <span class="result-position">
+                    #{{ loop.index }}
+                </span>
+
+                <h3 class="result-title">
+
+                    {% if result.url %}
+
+                    <a
+                        href="{{ result.url }}"
+                        class="result-link"
+                    >
+                        {{ result.title|default("Untitled") }}
+                    </a>
+
+                    {% else %}
+
+                        {{ result.title|default("Untitled") }}
+
+                    {% endif %}
+
+                </h3>
+
+            </div>
+
+
+            {% if result.score is defined %}
+
+            <div class="result-score">
+
+                <span>
+                    Relevance
+                </span>
+
+                <strong>
+                    {{ result.score }}
+                </strong>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Result metadata -->
+
+        <div class="result-metadata">
+
+            {% if result.category %}
+
+            <span class="metadata-item">
+
+                <strong>
+                    Category:
+                </strong>
+
+                {{ result.category }}
+
+            </span>
+
+            {% endif %}
+
+
+            {% if result.type %}
+
+            <span class="metadata-item">
+
+                <strong>
+                    Type:
+                </strong>
+
+                {{ result.type }}
+
+            </span>
+
+            {% endif %}
+
+
+            {% if result.created_at %}
+
+            <span class="metadata-item">
+
+                <strong>
+                    Created:
+                </strong>
+
+                {{ result.created_at }}
+
+            </span>
+
+            {% endif %}
+
+
+            {% if result.updated_at %}
+
+            <span class="metadata-item">
+
+                <strong>
+                    Updated:
+                </strong>
+
+                {{ result.updated_at }}
+
+            </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Result content -->
+
+        <div class="result-content">
+
+            {% if result.snippet %}
+
+            <p class="result-snippet">
+                {{ result.snippet }}
+            </p>
+
+            {% elif result.content %}
+
+            <p class="result-text">
+                {{ result.content }}
+            </p>
+
+            {% else %}
+
+            <p class="result-empty">
+                No preview is available for this result.
+            </p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Matched terms -->
+
+        {% if result.matched_terms %}
+
+        <div class="matched-terms">
+
+            <strong>
+                Matched:
+            </strong>
+
+            {% for term in result.matched_terms %}
+
+            <span class="match-chip">
+                {{ term }}
+            </span>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- Tags -->
+
+        {% if result.tags %}
+
+        <div class="result-tags">
+
+            <strong>
+                Tags:
+            </strong>
+
+            {% for tag in result.tags %}
+
+            <button
+                type="button"
+                class="tag-button"
+                data-tag="{{ tag }}"
+            >
+                #{{ tag }}
+            </button>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- Ranking explanation -->
+
+        {% if result.explanation %}
+
+        <div class="result-explanation">
+
+            <button
+                type="button"
+                class="toggle-explanation"
+            >
+                Why this result?
+            </button>
+
+            <div
+                class="explanation-content"
+                hidden
+            >
+                {{ result.explanation }}
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- Backend ranking details -->
+
+        {% if result.score_breakdown %}
+
+        <div class="score-breakdown">
+
+            <button
+                type="button"
+                class="toggle-score-breakdown"
+            >
+                Score details
+            </button>
+
+            <div
+                class="score-breakdown-content"
+                hidden
+            >
+
+                {% for key, value in result.score_breakdown.items() %}
+
+                <div class="score-row">
+
+                    <span>
+                        {{ key }}
+                    </span>
+
+                    <strong>
+                        {{ value }}
+                    </strong>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- Result actions -->
+
+        <div class="result-actions">
+
+            <button
+                type="button"
+                class="expand-result"
+            >
+                Expand
+            </button>
+
+
+            <button
+                type="button"
+                class="copy-result"
+                data-copy="{{ result.content|default('') }}"
+            >
+                Copy
+            </button>
+
+
+            {% if result.url %}
+
+            <a
+                href="{{ result.url }}"
+                class="open-result"
+            >
+                Open
+            </a>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Expandable result -->
+
+        <div
+            class="expanded-result"
+            hidden
+        >
+
+            {% if result.content %}
+
+            <div>
+
+                <h4>
+                    Full Content
+                </h4>
+
+                <p>
+                    {{ result.content }}
+                </p>
+
+            </div>
+
+            {% endif %}
+
+
+            {% if result.metadata %}
+
+            <div>
+
+                <h4>
+                    Metadata
+                </h4>
+
+                <dl>
+
+                    {% for key, value in result.metadata.items() %}
+
+                    <div>
+
+                        <dt>
+                            {{ key }}
+                        </dt>
+
+                        <dd>
+                            {{ value }}
+                        </dd>
+
+                    </div>
+
+                    {% endfor %}
+
+                </dl>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </article>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     EMPTY STATE
+========================================================= -->
+
+{% if query and not results and not search_error %}
+
+<div class="card empty-search-state">
+
+    <h2>
+        🔍 Nothing matched
+    </h2>
+
+    <p>
+        Try broadening the query or removing some filters.
+    </p>
+
+    <div class="grid">
+
+        <div>
+
+            <h4>
+                Try fewer terms
+            </h4>
+
+            <p>
+                Search for the most important concept first.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <h4>
+                Try a phrase
+            </h4>
+
+            <p>
+                Put related words inside quotation marks.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <h4>
+                Remove restrictions
+            </h4>
+
+            <p>
+                Temporarily remove filters or field restrictions.
+            </p>
+
+        </div>
+
+    </div>
+
+    <a href="/search">
+        Try another search
+    </a>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     PAGINATION
+========================================================= -->
+
+{% if pagination %}
+
+<div class="card pagination">
+
+    <div class="pagination-summary">
+
+        {% if pagination.total is defined %}
+
+        <p>
+
+            Showing
+
+            <strong>
+                {{ pagination.start|default(1) }}
+            </strong>
+
+            to
+
+            <strong>
+                {{ pagination.end|default(results|length) }}
+            </strong>
+
+            of
+
+            <strong>
+                {{ pagination.total }}
+            </strong>
+
+        </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="pagination-controls">
+
+        {% if pagination.previous_url %}
+
+        <a
+            href="{{ pagination.previous_url }}"
+            class="pagination-button"
+        >
+            ← Previous
+        </a>
+
+        {% endif %}
+
+
+        {% if pagination.page is defined %}
+
+        <span class="pagination-page">
+
+            Page
+            <strong>
+                {{ pagination.page }}
+            </strong>
+
+            {% if pagination.pages is defined %}
+
+            of
+            <strong>
+                {{ pagination.pages }}
+            </strong>
+
+            {% endif %}
+
+        </span>
+
+        {% endif %}
+
+
+        {% if pagination.next_url %}
+
+        <a
+            href="{{ pagination.next_url }}"
+            class="pagination-button"
+        >
+            Next →
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     SEARCH DIAGNOSTICS
+========================================================= -->
+
+{% if diagnostics %}
+
+<div class="card">
+
+    <div class="section-header">
+
+        <div>
+
+            <h3>
+                ⚙️ Search Diagnostics
+            </h3>
+
+            <p>
+                Technical information returned by the
+                search backend.
+            </p>
+
+        </div>
+
+        <button
+            type="button"
+            id="toggle-diagnostics"
+        >
+            Show
+        </button>
+
+    </div>
+
+
+    <div
+        id="diagnostics-content"
+        hidden
+    >
+
+        {% for key, value in diagnostics.items() %}
+
+        <div class="diagnostic-row">
+
+            <span>
+                {{ key }}
+            </span>
+
+            <strong>
+                {{ value }}
+            </strong>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================================================
+     FRONTEND STATE
+========================================================= -->
+
+<div
+    id="search-frontend-state"
+    data-query="{{ query|default('') }}"
+    data-result-count="{{ results|length if results else 0 }}"
+    hidden
+></div>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+(function () {
+    "use strict";
+
+    const resultsContainer =
+        document.getElementById("search-results");
+
+    const sortSelect =
+        document.getElementById("result-sort");
+
+    const densitySelect =
+        document.getElementById("result-density");
+
+    const copyQueryButton =
+        document.getElementById("copy-query");
+
+    const queryAnalysisButton =
+        document.getElementById(
+            "toggle-query-analysis"
+        );
+
+    const queryAnalysisContent =
+        document.getElementById(
+            "query-analysis-content"
+        );
+
+    const diagnosticsButton =
+        document.getElementById(
+            "toggle-diagnostics"
+        );
+
+    const diagnosticsContent =
+        document.getElementById(
+            "diagnostics-content"
+        );
+
+
+    /*
+     * ---------------------------------------------------------
+     * QUERY COPY
+     * ---------------------------------------------------------
+     */
+
+    if (copyQueryButton) {
+
+        copyQueryButton.addEventListener(
+            "click",
+            async function () {
+
+                const state =
+                    document.getElementById(
+                        "search-frontend-state"
+                    );
+
+                const query =
+                    state
+                        ? state.dataset.query
+                        : "";
+
+                if (!query) {
+                    return;
+                }
+
+                try {
+
+                    await navigator.clipboard.writeText(
+                        query
+                    );
+
+                    copyQueryButton.textContent =
+                        "Copied";
+
+                    setTimeout(
+                        function () {
+
+                            copyQueryButton.textContent =
+                                "Copy Query";
+
+                        },
+                        1500
+                    );
+
+                } catch (error) {
+
+                    console.warn(
+                        "Could not copy query.",
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * QUERY ANALYSIS TOGGLE
+     * ---------------------------------------------------------
+     */
+
+    if (
+        queryAnalysisButton &&
+        queryAnalysisContent
+    ) {
+
+        queryAnalysisButton.addEventListener(
+            "click",
+            function () {
+
+                const hidden =
+                    queryAnalysisContent.hidden;
+
+                queryAnalysisContent.hidden =
+                    !hidden;
+
+                queryAnalysisButton.textContent =
+                    hidden
+                        ? "Hide"
+                        : "Details";
+
+            }
+        );
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * DIAGNOSTICS TOGGLE
+     * ---------------------------------------------------------
+     */
+
+    if (
+        diagnosticsButton &&
+        diagnosticsContent
+    ) {
+
+        diagnosticsButton.addEventListener(
+            "click",
+            function () {
+
+                const hidden =
+                    diagnosticsContent.hidden;
+
+                diagnosticsContent.hidden =
+                    !hidden;
+
+                diagnosticsButton.textContent =
+                    hidden
+                        ? "Hide"
+                        : "Show";
+
+            }
+        );
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * RESULT EXPANSION
+     * ---------------------------------------------------------
+     */
+
+    if (resultsContainer) {
+
+        resultsContainer
+            .querySelectorAll(".expand-result")
+            .forEach(function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const result =
+                            button.closest(
+                                ".search-result"
+                            );
+
+                        if (!result) {
+                            return;
+                        }
+
+                        const expanded =
+                            result.querySelector(
+                                ".expanded-result"
+                            );
+
+                        if (!expanded) {
+                            return;
+                        }
+
+                        const hidden =
+                            expanded.hidden;
+
+                        expanded.hidden =
+                            !hidden;
+
+                        button.textContent =
+                            hidden
+                                ? "Collapse"
+                                : "Expand";
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * RANKING EXPLANATIONS
+     * ---------------------------------------------------------
+     */
+
+    if (resultsContainer) {
+
+        resultsContainer
+            .querySelectorAll(
+                ".toggle-explanation"
+            )
+            .forEach(function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const container =
+                            button.closest(
+                                ".result-explanation"
+                            );
+
+                        if (!container) {
+                            return;
+                        }
+
+                        const content =
+                            container.querySelector(
+                                ".explanation-content"
+                            );
+
+                        if (!content) {
+                            return;
+                        }
+
+                        const hidden =
+                            content.hidden;
+
+                        content.hidden =
+                            !hidden;
+
+                        button.textContent =
+                            hidden
+                                ? "Hide explanation"
+                                : "Why this result?";
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * SCORE BREAKDOWN
+     * ---------------------------------------------------------
+     */
+
+    if (resultsContainer) {
+
+        resultsContainer
+            .querySelectorAll(
+                ".toggle-score-breakdown"
+            )
+            .forEach(function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const container =
+                            button.closest(
+                                ".score-breakdown"
+                            );
+
+                        if (!container) {
+                            return;
+                        }
+
+                        const content =
+                            container.querySelector(
+                                ".score-breakdown-content"
+                            );
+
+                        if (!content) {
+                            return;
+                        }
+
+                        const hidden =
+                            content.hidden;
+
+                        content.hidden =
+                            !hidden;
+
+                        button.textContent =
+                            hidden
+                                ? "Hide score"
+                                : "Score details";
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * RESULT COPY
+     * ---------------------------------------------------------
+     */
+
+    if (resultsContainer) {
+
+        resultsContainer
+            .querySelectorAll(".copy-result")
+            .forEach(function (button) {
+
+                button.addEventListener(
+                    "click",
+                    async function () {
+
+                        const value =
+                            button.dataset.copy || "";
+
+                        if (!value) {
+                            return;
+                        }
+
+                        try {
+
+                            await navigator.clipboard.writeText(
+                                value
+                            );
+
+                            button.textContent =
+                                "Copied";
+
+                            setTimeout(
+                                function () {
+
+                                    button.textContent =
+                                        "Copy";
+
+                                },
+                                1200
+                            );
+
+                        } catch (error) {
+
+                            console.warn(
+                                "Could not copy result.",
+                                error
+                            );
+
+                        }
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * TAG INTERACTION
+     * ---------------------------------------------------------
+     */
+
+    if (resultsContainer) {
+
+        resultsContainer
+            .querySelectorAll(".tag-button")
+            .forEach(function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const tag =
+                            button.dataset.tag;
+
+                        if (!tag) {
+                            return;
+                        }
+
+                        const encoded =
+                            encodeURIComponent(
+                                tag
+                            );
+
+                        window.location.href =
+                            "/search?query=" +
+                            encoded;
+
+                    }
+                );
+
+            });
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * RESULT SORTING
+     * ---------------------------------------------------------
+     */
+
+    function getResults() {
+
+        if (!resultsContainer) {
+            return [];
+        }
+
+        return Array.from(
+            resultsContainer.querySelectorAll(
+                ".search-result"
+            )
+        );
+
+    }
+
+
+    function sortResults(mode) {
+
+        const results =
+            getResults();
+
+        if (!results.length) {
+            return;
+        }
+
+        results.sort(
+            function (a, b) {
+
+                if (mode === "score-desc") {
+
+                    return (
+                        Number(
+                            b.dataset.score || 0
+                        ) -
+                        Number(
+                            a.dataset.score || 0
+                        )
+                    );
+
+                }
+
+                if (mode === "score-asc") {
+
+                    return (
+                        Number(
+                            a.dataset.score || 0
+                        ) -
+                        Number(
+                            b.dataset.score || 0
+                        )
+                    );
+
+                }
+
+                if (mode === "title-asc") {
+
+                    return (
+                        a.dataset.title || ""
+                    ).localeCompare(
+                        b.dataset.title || ""
+                    );
+
+                }
+
+                if (mode === "title-desc") {
+
+                    return (
+                        b.dataset.title || ""
+                    ).localeCompare(
+                        a.dataset.title || ""
+                    );
+
+                }
+
+                return (
+                    Number(
+                        a.dataset.resultIndex || 0
+                    ) -
+                    Number(
+                        b.dataset.resultIndex || 0
+                    )
+                );
+
+            }
+        );
+
+
+        results.forEach(
+            function (result) {
+
+                resultsContainer.appendChild(
+                    result
+                );
+
+            }
+        );
+
+
+        results.forEach(
+            function (result, index) {
+
+                const position =
+                    result.querySelector(
+                        ".result-position"
+                    );
+
+                if (position) {
+
+                    position.textContent =
+                        "#" + (index + 1);
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (sortSelect) {
+
+        sortSelect.addEventListener(
+            "change",
+            function () {
+
+                sortResults(
+                    sortSelect.value
+                );
+
+            }
+        );
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * RESULT DENSITY
+     * ---------------------------------------------------------
+     */
+
+    if (densitySelect) {
+
+        densitySelect.addEventListener(
+            "change",
+            function () {
+
+                if (!resultsContainer) {
+                    return;
+                }
+
+                resultsContainer.dataset.density =
+                    densitySelect.value;
+
+            }
+        );
+
+    }
+
+
+    /*
+     * ---------------------------------------------------------
+     * KEYBOARD NAVIGATION
+     * ---------------------------------------------------------
+     */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key !== "j" &&
+                event.key !== "k"
+            ) {
+                return;
+            }
+
+            const active =
+                document.activeElement;
+
+            if (
+                active &&
+                (
+                    active.tagName === "INPUT" ||
+                    active.tagName === "TEXTAREA" ||
+                    active.tagName === "SELECT"
+                )
+            ) {
+                return;
+            }
+
+            const results =
+                getResults();
+
+            if (!results.length) {
+                return;
+            }
+
+            let current =
+                results.findIndex(
+                    function (result) {
+                        return result.classList.contains(
+                            "keyboard-active"
+                        );
+                    }
+                );
+
+            if (current >= 0) {
+
+                results[current]
+                    .classList.remove(
+                        "keyboard-active"
+                    );
+
+            }
+
+            if (event.key === "j") {
+
+                current =
+                    Math.min(
+                        current + 1,
+                        results.length - 1
+                    );
+
+            } else {
+
+                current =
+                    Math.max(
+                        current - 1,
+                        0
+                    );
+
+            }
+
+            const selected =
+                results[current];
+
+            selected.classList.add(
+                "keyboard-active"
+            );
+
+            selected.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        }
+    );
+
+
+    /*
+     * ---------------------------------------------------------
+     * INITIAL STATE
+     * ---------------------------------------------------------
+     */
+
+    if (resultsContainer) {
+
+        resultsContainer.dataset.ready =
+            "true";
+
+    }
+
+})();
+</script>
+
+
+<!-- =========================================================
+     FRONTEND NOTES
+========================================================= -->
+
+<div class="card">
+
+    <h3>Search Result System</h3>
+
+    <p>
+        This interface is designed to consume information
+        produced by the search backend rather than duplicate
+        the backend's ranking and retrieval logic.
+    </p>
+
+    <div class="grid">
+
+        <div>
+            <strong>Retrieval</strong>
+            <p>
+                Results are supplied by the backend.
+            </p>
+        </div>
+
+        <div>
+            <strong>Ranking</strong>
+            <p>
+                Relevance scores can be displayed
+                and inspected.
+            </p>
+        </div>
+
+        <div>
+            <strong>Analysis</strong>
+            <p>
+                Query interpretation can be surfaced
+                to the user.
+            </p>
+        </div>
+
+        <div>
+            <strong>Navigation</strong>
+            <p>
+                Results can be expanded, copied,
+                sorted, and navigated.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
