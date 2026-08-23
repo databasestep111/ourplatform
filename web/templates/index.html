@@ -1,47 +1,62 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>OurPlatform</title>
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block title %}
+OurPlatform Dashboard
+{% endblock %}
 
-    <h1>Welcome to OurPlatform</h1>
+{% block content %}
 
-    <p>Platform is running.</p>
+<div class="card">
 
-    <h2>Search</h2>
+    <h2>
+        Welcome to OurPlatform
+    </h2>
 
-    <form action="/search" method="POST">
-        <input
-            type="text"
-            name="query"
-            placeholder="Search..."
-        >
-        <button type="submit">Search</button>
-    </form>
+    <p>
+        Your central platform workspace.
+    </p>
 
-    <h2>Memory</h2>
+    <p>
+        Platform status:
+        <strong>{{ platform.running }}</strong>
+    </p>
 
-    <form action="/remember" method="POST">
-        <input
-            type="text"
-            name="text"
-            placeholder="What should I remember?"
-        >
-        <button type="submit">Save</button>
-    </form>
+</div>
 
-    <h2>Research</h2>
 
-    <form action="/research" method="POST">
-        <input
-            type="text"
-            name="question"
-            placeholder="What should I research?"
-        >
-        <button type="submit">Research</button>
-    </form>
+<div class="card">
 
-</body>
-</html>
+    <h2>
+        Platform Overview
+    </h2>
+
+    <p>
+        Memories:
+        <strong>{{ memory_count }}</strong>
+    </p>
+
+    <p>
+        Search items:
+        <strong>{{ search_count }}</strong>
+    </p>
+
+    <p>
+        Research tasks:
+        <strong>{{ research_count }}</strong>
+    </p>
+
+</div>
+
+{% if message %}
+
+<div class="card">
+
+    <h3>
+        {{ message }}
+    </h3>
+
+</div>
+
+{% endif %}
+
+{% endblock %}
