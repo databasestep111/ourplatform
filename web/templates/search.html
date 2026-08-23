@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block title %}
+OurPlatform Search
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================
+     SEARCH HEADER
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🔎 OurPlatform Search
+    </h2>
+
+    <p>
+        Search across information connected
+        to the platform.
+    </p>
+
+</div>
+
+
+<!-- =========================
+     SEARCH FORM
+========================= -->
+
+<div class="card">
+
+    <h2>
+        Search
+    </h2>
+
+    <form
+        action="/search"
+        method="POST"
+    >
+
+        <input
+            type="text"
+            name="query"
+            placeholder="Search memories, research, notes..."
+            value="{{ query or '' }}"
+            autocomplete="off"
+            required
+        >
+
+        <button type="submit">
+            🔎 Search
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- =========================
+     SEARCH INFORMATION
+========================= -->
+
+<div class="card">
+
+    <h3>
+        Search Information
+    </h3>
+
+    <p>
+        Search can eventually connect to
+        memory, research, documents,
+        knowledge, and other platform data.
+    </p>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                🧠 Memory
+            </h3>
+
+            <p>
+                Search information stored
+                in platform memory.
+            </p>
+
+            <strong>
+                {{ memory_count }}
+            </strong>
+
+            <small>
+                stored memories
+            </small>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                🔬 Research
+            </h3>
+
+            <p>
+                Find research questions
+                and research-related information.
+            </p>
+
+            <strong>
+                {{ research_count }}
+            </strong>
+
+            <small>
+                research tasks
+            </small>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                📚 Index
+            </h3>
+
+            <p>
+                Information currently available
+                to the search system.
+            </p>
+
+            <strong>
+                {{ search_count }}
+            </strong>
+
+            <small>
+                indexed items
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     RESULTS
+========================= -->
+
+{% if query %}
+
+<div class="card">
+
+    <h2>
+        Results
+    </h2>
+
+    <p>
+        Searching for:
+        <strong>
+            {{ query }}
+        </strong>
+    </p>
+
+
+    {% if results %}
+
+        <p>
+            Found
+            <strong>{{ results|length }}</strong>
+            result(s).
+        </p>
+
+
+        {% for result in results %}
+
+        <div class="card">
+
+            <h3>
+                {{ result.title }}
+            </h3>
+
+
+            <p>
+                {{ result.content }}
+            </p>
+
+
+            <!-- Category -->
+
+            {% if result.category %}
+
+            <p>
+
+                <strong>
+                    Category:
+                </strong>
+
+                {{ result.category }}
+
+            </p>
+
+            {% endif %}
+
+
+            <!-- Score -->
+
+            {% if result.score is defined %}
+
+            <p>
+
+                <strong>
+                    Relevance:
+                </strong>
+
+                {{ result.score }}
+
+            </p>
+
+            {% endif %}
+
+
+            <!-- Tags -->
+
+            {% if result.tags %}
+
+            <p>
+
+                <strong>
+                    Tags:
+                </strong>
+
+                {% for tag in result.tags %}
+
+                <span>
+                    #{{ tag }}
+                </span>
+
+                {% endfor %}
+
+            </p>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+
+    {% else %}
+
+        <div class="card">
+
+            <h3>
+                No results found
+            </h3>
+
+            <p>
+                Nothing matched your search.
+                Try a different word or phrase.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endif %}
+
+
+<!-- =========================
+     FUTURE SEARCH FEATURES
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🚀 Search System
+    </h2>
+
+    <p>
+        Future versions can expand this
+        interface with more advanced
+        search capabilities.
+    </p>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                Keyword Search
+            </h3>
+
+            <p>
+                Find exact words and phrases.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Category Search
+            </h3>
+
+            <p>
+                Search specific types of
+                information.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Tag Search
+            </h3>
+
+            <p>
+                Find information using tags.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Relevance Ranking
+            </h3>
+
+            <p>
+                Put the most useful results
+                first.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Memory Search
+            </h3>
+
+            <p>
+                Search information saved
+                through the memory system.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Research Search
+            </h3>
+
+            <p>
+                Connect search with research
+                tasks and findings.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
