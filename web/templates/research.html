@@ -1,0 +1,504 @@
+{% extends "base.html" %}
+
+{% block title %}
+OurPlatform Research
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================
+     RESEARCH HEADER
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🔬 Research Center
+    </h2>
+
+    <p>
+        Create, organize, and manage research
+        questions through the platform.
+    </p>
+
+</div>
+
+
+<!-- =========================
+     RESEARCH STATISTICS
+========================= -->
+
+<div class="grid">
+
+    <div class="card">
+
+        <h3>
+            📋 Research Tasks
+        </h3>
+
+        <strong>
+            {{ research_count }}
+        </strong>
+
+        <p>
+            Tasks currently created.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            🧠 Memories
+        </h3>
+
+        <strong>
+            {{ memory_count }}
+        </strong>
+
+        <p>
+            Information available to support
+            research.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>
+            🔎 Search Items
+        </h3>
+
+        <strong>
+            {{ search_count }}
+        </strong>
+
+        <p>
+            Information currently indexed
+            by the search system.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     NEW RESEARCH
+========================= -->
+
+<div class="card">
+
+    <h2>
+        ➕ Start New Research
+    </h2>
+
+    <p>
+        Enter a question or topic to create
+        a new research task.
+    </p>
+
+    <form
+        action="/research"
+        method="POST"
+    >
+
+        <label>
+            Research question
+        </label>
+
+        <textarea
+            name="question"
+            placeholder="What do you want to research?"
+            required
+        ></textarea>
+
+        <button type="submit">
+            Create Research Task
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- =========================
+     RESEARCH PIPELINE
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🔄 Research Pipeline
+    </h2>
+
+    <p>
+        A research task can eventually move
+        through several stages.
+    </p>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                1. Question
+            </h3>
+
+            <p>
+                Define the question that needs
+                to be investigated.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                2. Planning
+            </h3>
+
+            <p>
+                Break the question into smaller
+                research objectives.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                3. Investigation
+            </h3>
+
+            <p>
+                Gather relevant information
+                for the research task.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                4. Organization
+            </h3>
+
+            <p>
+                Organize useful information
+                and findings.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                5. Analysis
+            </h3>
+
+            <p>
+                Compare and examine the
+                collected information.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                6. Findings
+            </h3>
+
+            <p>
+                Produce useful conclusions
+                from the research.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                7. Memory
+            </h3>
+
+            <p>
+                Store useful research information
+                for later retrieval.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                8. Complete
+            </h3>
+
+            <p>
+                Mark the research task as
+                completed when appropriate.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     RESEARCH AREAS
+========================= -->
+
+<div class="card">
+
+    <h2>
+        📚 Research Areas
+    </h2>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                Questions
+            </h3>
+
+            <p>
+                Research begins with a clear
+                question or problem.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Sources
+            </h3>
+
+            <p>
+                Relevant information can
+                eventually be collected here.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Evidence
+            </h3>
+
+            <p>
+                Useful information can be
+                separated from irrelevant data.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Findings
+            </h3>
+
+            <p>
+                Important discoveries can be
+                organized into research findings.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     CONNECTED SYSTEMS
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🔗 Connected Platform Systems
+    </h2>
+
+    <div class="grid">
+
+        <div class="card">
+
+            <h3>
+                🔎 Search
+            </h3>
+
+            <p>
+                Search can help locate information
+                relevant to research.
+            </p>
+
+            <strong>
+                {{ search_count }}
+            </strong>
+
+            <p>
+                indexed items
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                🧠 Memory
+            </h3>
+
+            <p>
+                Useful research information can
+                eventually be stored for later use.
+            </p>
+
+            <strong>
+                {{ memory_count }}
+            </strong>
+
+            <p>
+                memories
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                ⚙️ Core
+            </h3>
+
+            <p>
+                Core coordinates the platform
+                components.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     TASK INFORMATION
+========================= -->
+
+<div class="card">
+
+    <h2>
+        📊 Research System
+    </h2>
+
+    <p>
+        Active research tasks:
+        <strong>
+            {{ research_count }}
+        </strong>
+    </p>
+
+    <p>
+        The research system currently
+        provides the foundation for creating
+        and organizing research tasks.
+    </p>
+
+    <p>
+        More advanced investigation,
+        source collection, analysis, and
+        reporting can be connected later.
+    </p>
+
+</div>
+
+
+<!-- =========================
+     ROADMAP
+========================= -->
+
+<div class="card">
+
+    <h2>
+        🚀 Research Roadmap
+    </h2>
+
+    <ul>
+
+        <li>
+            Research task creation
+        </li>
+
+        <li>
+            Task tracking
+        </li>
+
+        <li>
+            Research planning
+        </li>
+
+        <li>
+            Search integration
+        </li>
+
+        <li>
+            Source collection
+        </li>
+
+        <li>
+            Finding organization
+        </li>
+
+        <li>
+            Research analysis
+        </li>
+
+        <li>
+            Memory integration
+        </li>
+
+        <li>
+            Research reports
+        </li>
+
+    </ul>
+
+</div>
+
+
+{% if message %}
+
+<div class="card">
+
+    <h3>
+        {{ message }}
+    </h3>
+
+</div>
+
+{% endif %}
+
+
+{% endblock %}
