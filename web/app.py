@@ -1,14 +1,3 @@
-import sys
-import os
-
-PROJECT_ROOT = os.path.dirname(
-    os.path.dirname(
-        os.path.abspath(__file__)
-    )
-)
-
-sys.path.insert(0, PROJECT_ROOT)
-
 from flask import Flask, render_template, request
 
 from core.platform import platform
@@ -19,12 +8,22 @@ from research.researcher import Researcher
 
 app = Flask(__name__)
 
+
+# ==========================================
+# PLATFORM COMPONENTS
+# ==========================================
+
 memory = Memory()
 search = Search()
 researcher = Researcher()
 
 
+# ==========================================
+# PLATFORM SETUP
+# ==========================================
+
 def setup_platform():
+
     platform.register_component(
         "memory",
         memory
@@ -41,139 +40,217 @@ def setup_platform():
     )
 
 
-def get_platform_data():
+setup_platform()
+
+
+# ==========================================
+# START PLATFORM
+# ==========================================
+
+platform.start()
+
+
+# ==========================================
+# COMMON TEMPLATE DATA
+# ==========================================
+
+def template_data():
+
     return {
         "platform": platform.status(),
         "memory_count": memory.count(),
         "search_count": search.count(),
-        "research_count": len(
-            researcher.tasks
-        )
+        "research_count": len(researcher.tasks),
     }
 
 
+# ==========================================
+# DASHBOARD
+# ==========================================
+
 @app.route("/")
 def home():
-    return render_template(
-        "index.html",
-        **get_platform_data()
-    )
-
-
-@app.route("/remember", methods=["POST"])
-def remember():
-    text = request.form.get(
-        "text",
-        ""
-    ).strip()
-
-    message = ""
-
-    if text:
-        memory.remember(text)
-
-        search.add(
-            content=text,
-            title="Memory",
-            category="memory",
-            tags=["memory"]
-        )
-
-        message = (
-            "Information saved to memory."
-        )
-    else:
-        message = (
-            "Please enter something."
-        )
 
     return render_template(
         "index.html",
-        message=message,
-        **get_platform_data()
+        **template_data()
     )
 
 
-@app.route("/search", methods=["POST"])
-def search_platform():
-    query = request.form.get(
-        "query",
-        ""
-    ).strip()
+# ==========================================
+# SEARCH PAGE
+# ==========================================
+
+@app.route("/search", methods=["GET", "POST"])
+def search_page():
+
+    query = ""
 
     results = []
 
-    if query:
-        results = search.find(
-            query
-        )
+    if request.method == "POST":
+
+        query = request.form.get(
+            "query",
+            ""
+        ).strip()
+
+        if query:
+
+            results = search.find(query)
 
     return render_template(
-        "index.html",
+        "search.html",
         query=query,
         results=results,
-        **get_platform_data()
+        **template_data()
     )
 
 
-@app.route("/research", methods=["POST"])
-def research():
-    question = request.form.get(
-        "question",
-        ""
-    ).strip()
+# ==========================================
+# MEMORY PAGE
+# ==========================================
 
-    message = ""
+@app.route("/memory", methods=["GET", "POST"])
+def memory_page():
 
-    if question:
-        task = researcher.create_task(
-            question
-        )
+    message = None
 
-        memory.remember(
-            f"Research question: {question}"
-        )
+    if request.method == "POST":
 
-        search.add(
-            content=question,
-            title="Research Question",
-            category="research",
-            tags=["research"]
-        )
+        text = request.form.get(
+            "text",
+            ""
+        ).strip()
 
-        message = (
-            f"Research task #{task['id']} "
-            "created."
-        )
-    else:
-        message = (
-            "Please enter a research question."
-        )
+        if text:
+
+            memory.remember(text)
+
+            search.add(
+                content=text,
+                title="Memory",
+                category="memory",
+                tags=["memory"],
+            )
+
+            message = (
+                "Information saved to memory."
+            )
+
+        else:
+
+            message = (
+                "Please enter something "
+                "to remember."
+            )
 
     return render_template(
-        "index.html",
+        "memory.html",
         message=message,
-        **get_platform_data()
+        **template_data()
     )
 
 
-@app.route("/status")
-def status():
-    return platform.health_check()
+# ==========================================
+# RESEARCH PAGE
+# ==========================================
+
+@app.route("/research", methods=["GET", "POST"])
+def research_page():
+
+    message = None
+
+    if request.method == "POST":
+
+        question = request.form.get(
+            "question",
+            ""
+        ).strip()
+
+        if question:
+
+            task = researcher.create_task(
+                question
+            )
+
+            memory.remember(
+                f"Research question: {question}"
+            )
+
+            search.add(
+                content=question,
+                title="Research Question",
+                category="research",
+                tags=["research"],
+            )
+
+            message = (
+                f"Research task "
+                f"#{task['id']} created."
+            )
+
+        else:
+
+            message = (
+                "Please enter a research "
+                "question."
+            )
+
+    return render_template(
+        "research.html",
+        message=message,
+        **template_data()
+    )
 
 
-def start_platform():
-    setup_platform()
+# ==========================================
+# AI ASSISTANT PAGE
+# ==========================================
 
-    if not platform.running:
-        platform.start()
+@app.route("/assistant", methods=["GET"])
+def assistant_page():
 
+    return render_template(
+        "assistant.html",
+        **template_data()
+    )
+
+
+# ==========================================
+# SYSTEM PAGE
+# ==========================================
+
+@app.route("/system")
+def system_page():
+
+    return render_template(
+        "system.html",
+        **template_data()
+    )
+
+
+# ==========================================
+# HEALTH CHECK
+# ==========================================
+
+@app.route("/health")
+def health():
+
+    return {
+        "status": "ok",
+        "platform": platform.status(),
+    }
+
+
+# ==========================================
+# RUN APPLICATION
+# ==========================================
 
 if __name__ == "__main__":
-    start_platform()
 
     app.run(
         host="0.0.0.0",
         port=5000,
-        debug=True
+        debug=True,
     )
