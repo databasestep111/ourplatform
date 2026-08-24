@@ -1,0 +1,1413 @@
+{% extends "base.html" %}
+
+{% block title %}
+OurPlatform Search Engine
+{% endblock %}
+
+{% block content %}
+
+<!-- =========================================================  
+     OURPLATFORM SEARCH ENGINE  
+     Version: Search Frontend v1  
+       
+     This template is presentation/orchestration focused.  
+  
+     Expected backend variables may include:  
+  
+       query  
+       results  
+       total_results  
+       search_count  
+       memory_count  
+       research_count  
+       categories  
+       tags  
+       selected_category  
+       selected_tag  
+       selected_type  
+       selected_sort  
+       selected_limit  
+       offset  
+       pagination  
+       query_analysis  
+       search_metadata  
+       search_time  
+       search_mode  
+       research_available  
+       error  
+       warning  
+       suggestions  
+  
+     Expected result fields may include:  
+  
+       id  
+       title  
+       content  
+       snippet  
+       score  
+       category  
+       type  
+       tags  
+       created_at  
+       updated_at  
+       url  
+       match_type  
+       explanation  
+       highlights  
+       metadata  
+  
+     The template deliberately does not implement search logic.  
+     Search logic belongs in the backend.  
+========================================================= --><!-- =========================================================  PAGE HEADER
+
+========================================================= --><section class="card"><h1>
+🔎 OurPlatform Search
+
+</h1>  <p>  
+    Search across the information connected to  
+    the OurPlatform search system.  
+</p>  {% if search_mode %}
+
+<p>  
+    <strong>Mode:</strong>  
+    {{ search_mode }}  
+</p>  {% endif %}
+
+</section><!-- =========================================================  
+     ERROR STATE  
+========================================================= -->{% if error %}  <section class="card"><h2>  
+    ⚠️ Search Error  
+</h2>  <p>  
+    {{ error }}  
+</p>  <p>  
+    Check your query and try again.  
+</p>  </section>{% endif %}  <!-- =========================================================  
+     WARNING STATE  
+========================================================= -->{% if warning %}  <section class="card"><h3>  
+    ⚠️ Search Notice  
+</h3>  <p>  
+    {{ warning }}  
+</p>  </section>{% endif %}  <!-- =========================================================  
+     MAIN SEARCH FORM  
+========================================================= --><section class="card"><h2>  Search
+
+</h2>  <form  
+    action="/search"  
+    method="POST"  
+>  <label for="search-query">  
+    Search query  
+</label>  
+
+<input  
+    id="search-query"  
+    type="text"  
+    name="query"  
+    value="{{ query or '' }}"  
+    placeholder="Search anything..."  
+    autocomplete="off"  
+    autofocus  
+    required  
+>  
+
+<button  
+    type="submit"  
+>  
+    🔎 Search  
+</button>
+
+</form>  <p>  
+    <small>  
+        You can search using normal keywords,  
+        phrases, filters, fields, and advanced queries.  
+    </small>  
+</p>  </section><!-- =========================================================  
+     QUICK SEARCH EXAMPLES  
+========================================================= --><section class="card"><h3>  
+    Try a search  
+</h3>  <div class="grid">  <div class="card">  
+
+    <strong>  
+        Keyword  
+    </strong>  
+
+    <p>  
+        machine learning  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <strong>  
+        Phrase  
+    </strong>  
+
+    <p>  
+        "machine learning"  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <strong>  
+        Field  
+    </strong>  
+
+    <p>  
+        title:python  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <strong>  
+        Filter  
+    </strong>  
+
+    <p>  
+        category:research  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <strong>  
+        Boolean  
+    </strong>  
+
+    <p>  
+        python AND search  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <strong>  
+        Fuzzy  
+    </strong>  
+
+    <p>  
+        python~  
+    </p>  
+
+</div>
+
+</div>  </section><!-- =========================================================  
+     SUGGESTIONS  
+========================================================= -->{% if suggestions %}  <section class="card"><h3>  
+    💡 Suggestions  
+</h3>  {% for suggestion in suggestions %}
+
+<form  
+    action="/search"  
+    method="POST"  
+>  <input  
+    type="hidden"  
+    name="query"  
+    value="{{ suggestion }}"  
+>  
+
+<button type="submit">  
+    {{ suggestion }}  
+</button>
+
+</form>  {% endfor %}
+
+</section>{% endif %}  <!-- =========================================================  
+     ADVANCED SEARCH CONTROLS  
+========================================================= --><section class="card"><h2>  ⚙️ Search Controls
+
+</h2>  <form  
+    action="/search"  
+    method="POST"  
+>  <input  
+    type="hidden"  
+    name="query"  
+    value="{{ query or '' }}"  
+>  
+
+
+<!-- =================================================  
+     CATEGORY  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        Category  
+    </h3>  
+
+    <select  
+        name="category"  
+    >  
+
+        <option value="">  
+            All categories  
+        </option>  
+
+        {% for category in categories or [] %}  
+
+        <option  
+            value="{{ category }}"  
+            {% if selected_category == category %}  
+            selected  
+            {% endif %}  
+        >  
+
+            {{ category }}  
+
+        </option>  
+
+        {% endfor %}  
+
+    </select>  
+
+</div>  
+
+
+<!-- =================================================  
+     TYPE  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        Information Type  
+    </h3>  
+
+    <select  
+        name="type"  
+    >  
+
+        <option value="">  
+            All types  
+        </option>  
+
+        {% for item_type in types or [] %}  
+
+        <option  
+            value="{{ item_type }}"  
+            {% if selected_type == item_type %}  
+            selected  
+            {% endif %}  
+        >  
+
+            {{ item_type }}  
+
+        </option>  
+
+        {% endfor %}  
+
+    </select>  
+
+</div>  
+
+
+<!-- =================================================  
+     TAG  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        Tag  
+    </h3>  
+
+    <input  
+        type="text"  
+        name="tag"  
+        value="{{ selected_tag or '' }}"  
+        placeholder="example: research"  
+    >  
+
+</div>  
+
+
+<!-- =================================================  
+     SORTING  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        Sort  
+    </h3>  
+
+    <select  
+        name="sort"  
+    >  
+
+        <option  
+            value="relevance"  
+            {% if selected_sort == "relevance" %}  
+            selected  
+            {% endif %}  
+        >  
+            Relevance  
+        </option>  
+
+        <option  
+            value="date"  
+            {% if selected_sort == "date" %}  
+            selected  
+            {% endif %}  
+        >  
+            Newest  
+        </option>  
+
+        <option  
+            value="oldest"  
+            {% if selected_sort == "oldest" %}  
+            selected  
+            {% endif %}  
+        >  
+            Oldest  
+        </option>  
+
+        <option  
+            value="title"  
+            {% if selected_sort == "title" %}  
+            selected  
+            {% endif %}  
+        >  
+            Title  
+        </option>  
+
+    </select>  
+
+</div>  
+
+
+<!-- =================================================  
+     RESULT LIMIT  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        Results per page  
+    </h3>  
+
+    <select  
+        name="limit"  
+    >  
+
+        {% for value in [10, 20, 50, 100] %}  
+
+        <option  
+            value="{{ value }}"  
+            {% if selected_limit == value %}  
+            selected  
+            {% endif %}  
+        >  
+
+            {{ value }}  
+
+        </option>  
+
+        {% endfor %}  
+
+    </select>  
+
+</div>  
+
+
+<button  
+    type="submit"  
+>  
+    Apply Controls  
+</button>
+
+</form>  </section><!-- =========================================================  
+     SEARCH STATISTICS  
+========================================================= --><section class="card"><h2>  
+    📊 Search System  
+</h2>  <div class="grid">  <div class="card">  
+
+    <h3>  
+        Indexed  
+    </h3>  
+
+    <strong>  
+        {{ search_count or 0 }}  
+    </strong>  
+
+    <p>  
+        indexed items  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        🧠 Memory  
+    </h3>  
+
+    <strong>  
+        {{ memory_count or 0 }}  
+    </strong>  
+
+    <p>  
+        stored memories  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        🔬 Research  
+    </h3>  
+
+    <strong>  
+        {{ research_count or 0 }}  
+    </strong>  
+
+    <p>  
+        research records  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        Results  
+    </h3>  
+
+    <strong>  
+        {{ total_results or (results|length if results else 0) }}  
+    </strong>  
+
+    <p>  
+        matching results  
+    </p>  
+
+</div>
+
+</div>  </section><!-- =========================================================  
+     QUERY SUMMARY  
+========================================================= -->{% if query %}  <section class="card"><h2>  
+    Query  
+</h2>  <p>  
+    <strong>  
+        {{ query }}  
+    </strong>  
+</p>  {% if search_time is defined %}
+
+<p>  <strong>  
+    Search time:  
+</strong>  
+
+{{ search_time }}
+
+</p>  {% endif %}
+
+{% if query_analysis %}
+
+<div class="card">  <h3>  
+    🧠 Query Analysis  
+</h3>  
+
+
+{% if query_analysis.intent %}  
+
+<p>  
+
+    <strong>  
+        Intent:  
+    </strong>  
+
+    {{ query_analysis.intent }}  
+
+</p>  
+
+{% endif %}  
+
+
+{% if query_analysis.terms %}  
+
+<p>  
+
+    <strong>  
+        Terms:  
+    </strong>  
+
+    {% for term in query_analysis.terms %}  
+
+    <span>  
+        {{ term }}  
+    </span>  
+
+    {% endfor %}  
+
+</p>  
+
+{% endif %}  
+
+
+{% if query_analysis.phrases %}  
+
+<p>  
+
+    <strong>  
+        Phrases:  
+    </strong>  
+
+    {% for phrase in query_analysis.phrases %}  
+
+    <span>  
+        "{{ phrase }}"  
+    </span>  
+
+    {% endfor %}  
+
+</p>  
+
+{% endif %}  
+
+
+{% if query_analysis.fields %}  
+
+<p>  
+
+    <strong>  
+        Fields:  
+    </strong>  
+
+    {% for field in query_analysis.fields %}  
+
+    <span>  
+        {{ field }}  
+    </span>  
+
+    {% endfor %}  
+
+</p>  
+
+{% endif %}  
+
+
+{% if query_analysis.filters %}  
+
+<p>  
+
+    <strong>  
+        Filters:  
+    </strong>  
+
+    {{ query_analysis.filters|length }}  
+
+</p>  
+
+{% endif %}  
+
+
+{% if query_analysis.complexity is defined %}  
+
+<p>  
+
+    <strong>  
+        Complexity:  
+    </strong>  
+
+    {{ query_analysis.complexity }}  
+
+</p>  
+
+{% endif %}
+
+</div>  {% endif %}
+
+</section>{% endif %}  <!-- =========================================================  
+     RESULTS  
+========================================================= -->{% if query %}  <section class="card"><h2>  
+    📚 Search Results  
+</h2>  {% if results %}
+
+<p>  Found  
+
+<strong>  
+    {{ total_results or results|length }}  
+</strong>  
+
+matching result(s).
+
+</p>  <!-- =====================================================  
+     RESULT LIST  
+====================================================== -->  {% for result in results %}
+
+<article class="card">  <!-- =================================================  
+     RESULT HEADER  
+================================================== -->  
+
+<header>  
+
+    <h3>  
+
+        {% if result.url %}  
+
+        <a  
+            href="{{ result.url }}"  
+        >  
+            {{ result.title or "Untitled" }}  
+        </a>  
+
+        {% else %}  
+
+        {{ result.title or "Untitled" }}  
+
+        {% endif %}  
+
+    </h3>  
+
+
+    {% if result.type %}  
+
+    <p>  
+
+        <small>  
+            {{ result.type }}  
+        </small>  
+
+    </p>  
+
+    {% endif %}  
+
+</header>  
+
+
+<!-- =================================================  
+     RESULT SNIPPET  
+================================================== -->  
+
+<div>  
+
+    {% if result.snippet %}  
+
+    <p>  
+        {{ result.snippet }}  
+    </p>  
+
+    {% elif result.content %}  
+
+    <p>  
+        {{ result.content }}  
+    </p>  
+
+    {% else %}  
+
+    <p>  
+        No preview available.  
+    </p>  
+
+    {% endif %}  
+
+</div>  
+
+
+<!-- =================================================  
+     RESULT SCORE  
+================================================== -->  
+
+{% if result.score is defined %}  
+
+<div class="card">  
+
+    <strong>  
+        Relevance  
+    </strong>  
+
+    <p>  
+        {{ result.score }}  
+    </p>  
+
+</div>  
+
+{% endif %}  
+
+
+<!-- =================================================  
+     MATCH INFORMATION  
+================================================== -->  
+
+{% if result.match_type %}  
+
+<p>  
+
+    <strong>  
+        Match:  
+    </strong>  
+
+    {{ result.match_type }}  
+
+</p>  
+
+{% endif %}  
+
+
+<!-- =================================================  
+     CATEGORY  
+================================================== -->  
+
+{% if result.category %}  
+
+<p>  
+
+    <strong>  
+        Category:  
+    </strong>  
+
+    {{ result.category }}  
+
+</p>  
+
+{% endif %}  
+
+
+<!-- =================================================  
+     TAGS  
+================================================== -->  
+
+{% if result.tags %}  
+
+<div>  
+
+    <strong>  
+        Tags:  
+    </strong>  
+
+    {% for tag in result.tags %}  
+
+    <span>  
+        #{{ tag }}  
+    </span>  
+
+    {% endfor %}  
+
+</div>  
+
+{% endif %}  
+
+
+<!-- =================================================  
+     DATES  
+================================================== -->  
+
+{% if result.created_at %}  
+
+<p>  
+
+    <small>  
+
+        Created:  
+        {{ result.created_at }}  
+
+    </small>  
+
+</p>  
+
+{% endif %}  
+
+
+{% if result.updated_at %}  
+
+<p>  
+
+    <small>  
+
+        Updated:  
+        {{ result.updated_at }}  
+
+    </small>  
+
+</p>  
+
+{% endif %}  
+
+
+<!-- =================================================  
+     RESULT METADATA  
+================================================== -->  
+
+{% if result.metadata %}  
+
+<details>  
+
+    <summary>  
+        Metadata  
+    </summary>  
+
+    <div>  
+
+        {% for key, value in result.metadata.items() %}  
+
+        <p>  
+
+            <strong>  
+                {{ key }}:  
+            </strong>  
+
+            {{ value }}  
+
+        </p>  
+
+        {% endfor %}  
+
+    </div>  
+
+</details>  
+
+{% endif %}  
+
+
+<!-- =================================================  
+     RANKING EXPLANATION  
+================================================== -->  
+
+{% if result.explanation %}  
+
+<details>  
+
+    <summary>  
+        Why this result?  
+    </summary>  
+
+    <p>  
+        {{ result.explanation }}  
+    </p>  
+
+</details>  
+
+{% endif %}
+
+</article>  {% endfor %}
+
+<!-- =====================================================  
+     PAGINATION  
+====================================================== -->  {% if pagination %}
+
+<section class="card">  <h3>  
+    Pagination  
+</h3>  
+
+
+{% if pagination.previous %}  
+
+<form  
+    action="/search"  
+    method="POST"  
+>  
+
+    <input  
+        type="hidden"  
+        name="query"  
+        value="{{ query }}"  
+    >  
+
+    <input  
+        type="hidden"  
+        name="offset"  
+        value="{{ pagination.previous_offset }}"  
+    >  
+
+    <button type="submit">  
+        ← Previous  
+    </button>  
+
+</form>  
+
+{% endif %}  
+
+
+<p>  
+
+    Page  
+
+    <strong>  
+        {{ pagination.page }}  
+    </strong>  
+
+    {% if pagination.total_pages %}  
+
+    of  
+
+    <strong>  
+        {{ pagination.total_pages }}  
+    </strong>  
+
+    {% endif %}  
+
+</p>  
+
+
+{% if pagination.next %}  
+
+<form  
+    action="/search"  
+    method="POST"  
+>  
+
+    <input  
+        type="hidden"  
+        name="query"  
+        value="{{ query }}"  
+    >  
+
+    <input  
+        type="hidden"  
+        name="offset"  
+        value="{{ pagination.next_offset }}"  
+    >  
+
+    <button type="submit">  
+        Next →  
+    </button>  
+
+</form>  
+
+{% endif %}
+
+</section>  {% endif %}
+
+{% else %}
+
+<!-- =====================================================  
+     NO RESULTS  
+====================================================== -->  <section class="card">  <h3>  
+    No results found  
+</h3>  
+
+<p>  
+    Nothing matched this query.  
+</p>  
+
+<p>  
+    Try broader keywords, remove a filter,  
+    or search using a different phrase.  
+</p>
+
+</section>  {% endif %}
+
+</section>{% endif %}  <!-- =========================================================  
+     SEARCH MODES  
+========================================================= --><section class="card"><h2>  🚀 Search Modes
+
+</h2>  <div class="grid">  <!-- =================================================  
+     STANDARD  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        🔎 Standard  
+    </h3>  
+
+    <p>  
+        Normal keyword and phrase searching.  
+    </p>  
+
+</div>  
+
+
+<!-- =================================================  
+     ADVANCED  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        ⚙️ Advanced  
+    </h3>  
+
+    <p>  
+        Field queries, Boolean logic,  
+        filters, ranges, sorting, and pagination.  
+    </p>  
+
+</div>  
+
+
+<!-- =================================================  
+     RESEARCH  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        🔬 Research  
+    </h3>  
+
+    <p>  
+        Search information relevant to  
+        research tasks and investigations.  
+    </p>  
+
+    {% if research_available %}  
+
+    <strong>  
+        Available  
+    </strong>  
+
+    {% else %}  
+
+    <small>  
+        Backend integration pending  
+    </small>  
+
+    {% endif %}  
+
+</div>  
+
+
+<!-- =================================================  
+     MEMORY  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        🧠 Memory  
+    </h3>  
+
+    <p>  
+        Search information stored  
+        by the platform memory system.  
+    </p>  
+
+</div>  
+
+
+<!-- =================================================  
+     SEMANTIC  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        🧩 Semantic  
+    </h3>  
+
+    <p>  
+        Search based on meaning and  
+        related concepts rather than  
+        exact word matches.  
+    </p>  
+
+</div>  
+
+
+<!-- =================================================  
+     AI  
+================================================== -->  
+
+<div class="card">  
+
+    <h3>  
+        🤖 AI Search  
+    </h3>  
+
+    <p>  
+        Interpret complex queries and  
+        connect search with the AI layer.  
+    </p>  
+
+</div>
+
+</div>  </section><!-- =========================================================  
+     SEARCH CAPABILITIES  
+========================================================= --><section class="card"><h2>  
+    🧠 Backend Capabilities  
+</h2>  <div class="grid">  <div class="card">  
+
+    <h3>  
+        Query Parsing  
+    </h3>  
+
+    <p>  
+        Converts raw user input into  
+        structured search queries.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        Tokenization  
+    </h3>  
+
+    <p>  
+        Breaks search text into useful  
+        searchable units.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        Indexing  
+    </h3>  
+
+    <p>  
+        Locates candidate information  
+        efficiently.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        Retrieval  
+    </h3>  
+
+    <p>  
+        Generates candidate results  
+        for ranking.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        Ranking  
+    </h3>  
+
+    <p>  
+        Orders candidates according  
+        to relevance.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        Analysis  
+    </h3>  
+
+    <p>  
+        Extracts useful information  
+        from queries and documents.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        Filtering  
+    </h3>  
+
+    <p>  
+        Narrows results using structured  
+        metadata.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        Matching  
+    </h3>  
+
+    <p>  
+        Supports exact, phrase,  
+        fuzzy, and other matching strategies.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        Research Integration  
+    </h3>  
+
+    <p>  
+        Allows search to become a foundation  
+        for deeper research workflows.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        AI Integration  
+    </h3>  
+
+    <p>  
+        Provides a path toward intelligent  
+        query interpretation and synthesis.  
+    </p>  
+
+</div>
+
+</div>  </section><!-- =========================================================  
+     SEARCH DIAGNOSTICS  
+========================================================= -->{% if search_metadata %}  <section class="card"><h2>  
+    🛠️ Search Diagnostics  
+</h2>  {% if search_metadata.engine %}
+
+<p>  <strong>  
+    Engine:  
+</strong>  
+
+{{ search_metadata.engine }}
+
+</p>  {% endif %}
+
+{% if search_metadata.version %}
+
+<p>  <strong>  
+    Version:  
+</strong>  
+
+{{ search_metadata.version }}
+
+</p>  {% endif %}
+
+{% if search_metadata.documents_examined is defined %}
+
+<p>  <strong>  
+    Documents examined:  
+</strong>  
+
+{{ search_metadata.documents_examined }}
+
+</p>  {% endif %}
+
+{% if search_metadata.candidates is defined %}
+
+<p>  <strong>  
+    Candidates:  
+</strong>  
+
+{{ search_metadata.candidates }}
+
+</p>  {% endif %}
+
+{% if search_metadata.ranking_enabled is defined %}
+
+<p>  <strong>  
+    Ranking:  
+</strong>  
+
+{% if search_metadata.ranking_enabled %}  
+    enabled  
+{% else %}  
+    disabled  
+{% endif %}
+
+</p>  {% endif %}
+
+{% if search_metadata.index_enabled is defined %}
+
+<p>  <strong>  
+    Index:  
+</strong>  
+
+{% if search_metadata.index_enabled %}  
+    enabled  
+{% else %}  
+    disabled  
+{% endif %}
+
+</p>  {% endif %}
+
+</section>{% endif %}  <!-- =========================================================  
+     RESEARCH CONNECTION  
+========================================================= --><section class="card"><h2>  🔬 Search → Research
+
+</h2>  <p>  
+    Search can provide the discovery layer  
+    for the platform's research system.  
+</p>  <div class="grid">  <div class="card">  
+
+    <h3>  
+        1. Search  
+    </h3>  
+
+    <p>  
+        Find potentially relevant information.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        2. Retrieve  
+    </h3>  
+
+    <p>  
+        Collect relevant candidates and evidence.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        3. Analyse  
+    </h3>  
+
+    <p>  
+        Examine the retrieved information.  
+    </p>  
+
+</div>  
+
+
+<div class="card">  
+
+    <h3>  
+        4. Research  
+    </h3>  
+
+    <p>  
+        Turn the discovered information  
+        into a deeper research workflow.  
+    </p>  
+
+</div>
+
+</div>  </section><!-- =========================================================  
+     FOOTER INFORMATION  
+========================================================= --><section class="card"><h3>  
+    OurPlatform Search Engine  
+</h3>  <p>  
+    The frontend is a presentation layer.  
+    Query understanding, retrieval, indexing,  
+    ranking, analysis, and research logic  
+    belong to the backend.  
+</p>  </section>{% endblock %}
