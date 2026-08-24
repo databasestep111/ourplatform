@@ -1,17 +1,10 @@
 """
 OurPlatform API routing layer.
 
-This module provides the central routing/dispatch layer for the API.
+Central API routing and assembly layer.
 
-Responsibilities
-----------------
-- Register API endpoints.
-- Dispatch incoming requests.
-- Normalize request data.
-- Normalize API responses.
-- Handle common API errors.
-- Provide health and information endpoints.
-- Connect specialized API modules without duplicating their logic.
+The router owns request/response orchestration.
+Specialized API modules own their actual backend logic.
 
 Architecture
 ------------
@@ -34,10 +27,6 @@ Architecture
         |
         v
     Existing backend systems
-
-This module is deliberately an orchestration layer.
-Search, ranking, research, and other backend logic should remain
-inside their respective modules.
 """
 
 from __future__ import annotations
@@ -60,15 +49,6 @@ Handler = Callable[..., Any]
 
 @dataclass
 class APIRequest:
-    """
-    Normalized representation of an API request.
-
-    The web framework can translate its native request object into
-    this structure before dispatching it.
-
-    Keeping this representation framework-independent makes the
-    search API easier to test outside the web server.
-    """
 
     method: str = "GET"
 
@@ -91,9 +71,6 @@ class APIRequest:
     )
 
     def normalized_method(self) -> str:
-        """
-        Return an uppercase HTTP method.
-        """
 
         return (
             self.method
@@ -105,9 +82,6 @@ class APIRequest:
         key: str,
         default: Any = None,
     ) -> Any:
-        """
-        Retrieve a value from the body first, then query data.
-        """
 
         if key in self.body:
             return self.body[key]
@@ -124,12 +98,6 @@ class APIRequest:
 
 @dataclass
 class APIResponse:
-    """
-    Standardized API response.
-
-    Every endpoint can return this structure before the web framework
-    converts it into its native JSON response.
-    """
 
     data: Any = None
 
@@ -148,9 +116,6 @@ class APIResponse:
     )
 
     def to_dict(self) -> Dict[str, Any]:
-        """
-        Convert the response into a JSON-friendly dictionary.
-        """
 
         return {
             "success": self.success,
@@ -168,9 +133,6 @@ class APIResponse:
 
 @dataclass
 class RouteDefinition:
-    """
-    Describes one API endpoint.
-    """
 
     path: str
 
@@ -194,9 +156,6 @@ class RouteDefinition:
         self,
         method: str,
     ) -> bool:
-        """
-        Determine whether the route accepts the given method.
-        """
 
         return (
             method.upper()
@@ -212,13 +171,6 @@ class RouteDefinition:
 # ============================================================================
 
 class APIRouter:
-    """
-    Lightweight framework-independent API router.
-
-    It provides route registration and dispatch without forcing
-    the search system to depend directly on Flask, FastAPI, Django,
-    or another framework.
-    """
 
     def __init__(self) -> None:
 
@@ -256,9 +208,9 @@ class APIRouter:
             ]
         ] = {}
 
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # ROUTE REGISTRATION
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
 
     def add_route(
         self,
@@ -272,9 +224,6 @@ class APIRouter:
         replace: bool = False,
         metadata: Optional[Mapping[str, Any]] = None,
     ) -> RouteDefinition:
-        """
-        Register an API route.
-        """
 
         normalized_path = self._normalize_path(
             path
@@ -314,9 +263,6 @@ class APIRouter:
         self,
         path: str,
     ) -> bool:
-        """
-        Remove a registered route.
-        """
 
         normalized_path = self._normalize_path(
             path
@@ -335,17 +281,14 @@ class APIRouter:
         self,
         path: str,
     ) -> Optional[RouteDefinition]:
-        """
-        Retrieve a route definition.
-        """
 
         return self.routes.get(
             self._normalize_path(path)
         )
 
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # MIDDLEWARE
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
 
     def add_middleware(
         self,
@@ -354,9 +297,6 @@ class APIRouter:
             APIRequest
         ],
     ) -> None:
-        """
-        Add request middleware.
-        """
 
         self.middleware.append(
             middleware
@@ -369,9 +309,6 @@ class APIRouter:
             Optional[APIResponse]
         ],
     ) -> None:
-        """
-        Add a handler executed before route dispatch.
-        """
 
         self.before_handlers.append(
             handler
@@ -384,17 +321,14 @@ class APIRouter:
             APIResponse
         ],
     ) -> None:
-        """
-        Add a handler executed after route dispatch.
-        """
 
         self.after_handlers.append(
             handler
         )
 
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # ERROR HANDLING
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
 
     def register_error_handler(
         self,
@@ -404,43 +338,19 @@ class APIRouter:
             APIResponse
         ],
     ) -> None:
-        """
-        Register a custom exception handler.
-        """
 
         self.error_handlers[
             exception_type
         ] = handler
 
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # DISPATCH
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
 
     def dispatch(
         self,
         request: APIRequest,
     ) -> APIResponse:
-        """
-        Dispatch an API request.
-
-        Processing order:
-
-            request
-              ↓
-            middleware
-              ↓
-            before handlers
-              ↓
-            route lookup
-              ↓
-            method validation
-              ↓
-            endpoint handler
-              ↓
-            after handlers
-              ↓
-            response
-        """
 
         try:
 
@@ -533,17 +443,14 @@ class APIRouter:
                 request,
             )
 
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # INTERNAL ROUTING
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
 
     def _normalize_path(
         self,
         path: str,
     ) -> str:
-        """
-        Normalize API paths.
-        """
 
         if not path:
             return "/"
@@ -565,9 +472,6 @@ class APIRouter:
         self,
         request: APIRequest,
     ) -> APIRequest:
-        """
-        Apply request middleware in registration order.
-        """
 
         current = request
 
@@ -588,9 +492,6 @@ class APIRouter:
         self,
         request: APIRequest,
     ) -> Optional[APIResponse]:
-        """
-        Execute pre-dispatch handlers.
-        """
 
         for handler in self.before_handlers:
 
@@ -599,6 +500,7 @@ class APIRouter:
             )
 
             if response is not None:
+
                 return normalize_response(
                     response
                 )
@@ -610,9 +512,6 @@ class APIRouter:
         request: APIRequest,
         response: APIResponse,
     ) -> APIResponse:
-        """
-        Execute post-dispatch handlers.
-        """
 
         current = response
 
@@ -624,6 +523,7 @@ class APIRouter:
             )
 
             if result is not None:
+
                 current = normalize_response(
                     result
                 )
@@ -635,9 +535,6 @@ class APIRouter:
         exception: Exception,
         request: APIRequest,
     ) -> APIResponse:
-        """
-        Resolve an exception through the registered error handlers.
-        """
 
         exception_type = type(
             exception
@@ -667,14 +564,11 @@ class APIRouter:
             code="internal_error",
         )
 
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # INTROSPECTION
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------
 
     def describe(self) -> list[Dict[str, Any]]:
-        """
-        Return a machine-readable description of registered routes.
-        """
 
         result = []
 
@@ -707,9 +601,6 @@ class APIRouter:
 def normalize_response(
     result: Any,
 ) -> APIResponse:
-    """
-    Convert common endpoint return values into APIResponse.
-    """
 
     if isinstance(
         result,
@@ -763,9 +654,6 @@ def success_response(
     status_code: int = 200,
     **metadata: Any,
 ) -> APIResponse:
-    """
-    Create a successful API response.
-    """
 
     return APIResponse(
         data=data,
@@ -783,9 +671,6 @@ def error_response(
     code: str = "api_error",
     **details: Any,
 ) -> APIResponse:
-    """
-    Create a standardized API error response.
-    """
 
     return APIResponse(
         data=None,
@@ -803,18 +688,12 @@ def error_response(
 
 
 # ============================================================================
-# GENERAL REQUEST NORMALIZATION
+# REQUEST NORMALIZATION
 # ============================================================================
 
 def normalize_request(
     request: Any,
 ) -> APIRequest:
-    """
-    Convert common request representations into APIRequest.
-
-    This makes it possible to adapt Flask/FastAPI/custom framework
-    requests later without changing the router itself.
-    """
 
     if isinstance(
         request,
@@ -870,67 +749,55 @@ def normalize_request(
             ),
         )
 
-    method = getattr(
-        request,
-        "method",
-        "GET",
-    )
-
-    path = getattr(
-        request,
-        "path",
-        "/",
-    )
-
-    query = getattr(
-        request,
-        "query",
-        {},
-    )
-
-    body = getattr(
-        request,
-        "body",
-        {},
-    )
-
-    headers = getattr(
-        request,
-        "headers",
-        {},
-    )
-
     return APIRequest(
         method=str(
-            method
+            getattr(
+                request,
+                "method",
+                "GET",
+            )
         ),
         path=str(
-            path
+            getattr(
+                request,
+                "path",
+                "/",
+            )
         ),
         query=dict(
-            query or {}
+            getattr(
+                request,
+                "query",
+                {},
+            )
+            or {}
         ),
         body=dict(
-            body or {}
+            getattr(
+                request,
+                "body",
+                {},
+            )
+            or {}
         ),
         headers=dict(
-            headers or {}
+            getattr(
+                request,
+                "headers",
+                {},
+            )
+            or {}
         ),
     )
 
 
 # ============================================================================
-# STANDARD API ENDPOINTS
+# STANDARD ENDPOINTS
 # ============================================================================
 
 def health_endpoint(
     request: APIRequest,
 ) -> APIResponse:
-    """
-    Basic API health endpoint.
-
-    Does not perform a search.
-    """
 
     try:
 
@@ -954,9 +821,6 @@ def health_endpoint(
 def info_endpoint(
     request: APIRequest,
 ) -> APIResponse:
-    """
-    Return API package metadata.
-    """
 
     try:
 
@@ -980,12 +844,6 @@ def info_endpoint(
 def not_implemented_endpoint(
     request: APIRequest,
 ) -> APIResponse:
-    """
-    Temporary endpoint handler.
-
-    Specialized modules will replace these handlers as they
-    are connected to the real backend systems.
-    """
 
     return error_response(
         message=(
@@ -1003,22 +861,25 @@ def not_implemented_endpoint(
 
 def create_router() -> APIRouter:
     """
-    Create the central API router.
+    Create the central router and connect every specialized API
+    module that is currently available.
 
-    Specialized API modules can register their handlers onto
-    this router as they are implemented.
+    Specialized modules register their own routes and remain
+    responsible for their backend logic.
     """
 
     router = APIRouter()
+
+    # ------------------------------------------------------------------
+    # CORE ROUTES
+    # ------------------------------------------------------------------
 
     router.add_route(
         "/api/health",
         health_endpoint,
         methods=("GET",),
         name="health",
-        description=(
-            "Return API health information."
-        ),
+        description="Return API health information.",
     )
 
     router.add_route(
@@ -1026,89 +887,186 @@ def create_router() -> APIRouter:
         info_endpoint,
         methods=("GET",),
         name="info",
-        description=(
-            "Return API package information."
-        ),
+        description="Return API package information.",
     )
 
-    router.add_route(
-        "/api/search",
-        not_implemented_endpoint,
-        methods=("GET", "POST"),
-        name="search",
-        description=(
-            "Search indexed platform information."
-        ),
-    )
+    # ------------------------------------------------------------------
+    # SPECIALIZED API MODULES
+    #
+    # These imports are intentionally local.
+    # This prevents circular imports while allowing each API module
+    # to import APIRequest/APIResponse from this module.
+    # ------------------------------------------------------------------
 
-    router.add_route(
-        "/api/query",
-        not_implemented_endpoint,
-        methods=("GET", "POST"),
-        name="query",
-        description=(
-            "Analyse and normalize search queries."
-        ),
-    )
+    try:
 
-    router.add_route(
-        "/api/ranking",
-        not_implemented_endpoint,
-        methods=("GET", "POST"),
-        name="ranking",
-        description=(
-            "Rank search candidates."
-        ),
-    )
+        from .search_api import register_search_routes
 
-    router.add_route(
-        "/api/retrieval",
-        not_implemented_endpoint,
-        methods=("GET", "POST"),
-        name="retrieval",
-        description=(
-            "Retrieve search candidates."
-        ),
-    )
+        register_search_routes(
+            router
+        )
 
-    router.add_route(
-        "/api/filters",
-        not_implemented_endpoint,
-        methods=("GET", "POST"),
-        name="filters",
-        description=(
-            "Apply structured search filters."
-        ),
-    )
+    except ImportError:
 
-    router.add_route(
-        "/api/suggestions",
-        not_implemented_endpoint,
-        methods=("GET", "POST"),
-        name="suggestions",
-        description=(
-            "Generate search suggestions."
-        ),
-    )
+        # Search API is not available.
+        # Its old placeholder route is installed below.
+        router.add_route(
+            "/api/search",
+            not_implemented_endpoint,
+            methods=("GET", "POST"),
+            name="search",
+            description=(
+                "Search indexed platform information."
+            ),
+        )
 
-    router.add_route(
-        "/api/research",
-        not_implemented_endpoint,
-        methods=("GET", "POST"),
-        name="research",
-        description=(
-            "Connect search with research systems."
-        ),
-    )
+    # ------------------------------------------------------------------
+    # QUERY
+    # ------------------------------------------------------------------
+
+    try:
+
+        from .query_api import register_query_routes
+
+        register_query_routes(
+            router
+        )
+
+    except ImportError:
+
+        router.add_route(
+            "/api/query",
+            not_implemented_endpoint,
+            methods=("GET", "POST"),
+            name="query",
+            description=(
+                "Analyse and normalize search queries."
+            ),
+        )
+
+    # ------------------------------------------------------------------
+    # RANKING
+    # ------------------------------------------------------------------
+
+    try:
+
+        from .ranking_api import register_ranking_routes
+
+        register_ranking_routes(
+            router
+        )
+
+    except ImportError:
+
+        router.add_route(
+            "/api/ranking",
+            not_implemented_endpoint,
+            methods=("GET", "POST"),
+            name="ranking",
+            description="Rank search candidates.",
+        )
+
+    # ------------------------------------------------------------------
+    # RETRIEVAL
+    # ------------------------------------------------------------------
+
+    try:
+
+        from .retrieval_api import register_retrieval_routes
+
+        register_retrieval_routes(
+            router
+        )
+
+    except ImportError:
+
+        router.add_route(
+            "/api/retrieval",
+            not_implemented_endpoint,
+            methods=("GET", "POST"),
+            name="retrieval",
+            description="Retrieve search candidates.",
+        )
+
+    # ------------------------------------------------------------------
+    # FILTERS
+    # ------------------------------------------------------------------
+
+    try:
+
+        from .filters_api import register_filter_routes
+
+        register_filter_routes(
+            router
+        )
+
+    except ImportError:
+
+        router.add_route(
+            "/api/filters",
+            not_implemented_endpoint,
+            methods=("GET", "POST"),
+            name="filters",
+            description="Apply structured search filters.",
+        )
+
+    # ------------------------------------------------------------------
+    # SUGGESTIONS
+    # ------------------------------------------------------------------
+
+    try:
+
+        from .suggestions_api import register_suggestion_routes
+
+        register_suggestion_routes(
+            router
+        )
+
+    except ImportError:
+
+        router.add_route(
+            "/api/suggestions",
+            not_implemented_endpoint,
+            methods=("GET", "POST"),
+            name="suggestions",
+            description="Generate search suggestions.",
+        )
+
+    # ------------------------------------------------------------------
+    # RESEARCH
+    # ------------------------------------------------------------------
+
+    try:
+
+        from .research_api import register_research_routes
+
+        register_research_routes(
+            router
+        )
+
+    except ImportError:
+
+        router.add_route(
+            "/api/research",
+            not_implemented_endpoint,
+            methods=("GET", "POST"),
+            name="research",
+            description="Connect search with research systems.",
+        )
+
+    # ------------------------------------------------------------------
+    # RESULTS
+    #
+    # Results remain a placeholder until their specialized module
+    # exists.
+    # ------------------------------------------------------------------
 
     router.add_route(
         "/api/results",
         not_implemented_endpoint,
         methods=("GET", "POST"),
         name="results",
-        description=(
-            "Return structured search results."
-        ),
+        description="Return structured search results.",
     )
 
     return router
@@ -1122,15 +1080,12 @@ router = create_router()
 
 
 # ============================================================================
-# PUBLIC DISPATCH FUNCTIONS
+# PUBLIC DISPATCH
 # ============================================================================
 
 def dispatch(
     request: Any,
 ) -> APIResponse:
-    """
-    Dispatch a request through the default API router.
-    """
 
     normalized = normalize_request(
         request
@@ -1150,9 +1105,6 @@ def api_call(
     headers: Optional[Mapping[str, str]] = None,
     metadata: Optional[Mapping[str, Any]] = None,
 ) -> APIResponse:
-    """
-    Convenience function for internal API calls and testing.
-    """
 
     request = APIRequest(
         method=method,
@@ -1181,9 +1133,6 @@ def api_call(
 # ============================================================================
 
 def list_routes() -> list[Dict[str, Any]]:
-    """
-    Return all registered routes.
-    """
 
     return router.describe()
 
@@ -1191,9 +1140,6 @@ def list_routes() -> list[Dict[str, Any]]:
 def route_exists(
     path: str,
 ) -> bool:
-    """
-    Determine whether a route exists.
-    """
 
     return (
         router.get_route(
@@ -1208,9 +1154,6 @@ def route_exists(
 # ============================================================================
 
 def utc_timestamp() -> str:
-    """
-    Return an ISO-8601 UTC timestamp.
-    """
 
     return (
         datetime.now(
